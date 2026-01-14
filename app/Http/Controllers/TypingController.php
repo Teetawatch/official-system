@@ -116,6 +116,16 @@ class TypingController extends Controller
             ->with(['submissions' => function($query) use ($userId) {
                 $query->where('user_id', $userId);
             }])
+            ->where(function($q) use ($userId) {
+                // Show if:
+                // 1. Due date is not set (null) OR Future date
+                // 2. OR User has already submitted it (even if expired)
+                $q->whereNull('due_date')
+                  ->orWhere('due_date', '>=', now())
+                  ->orWhereHas('submissions', function($subQ) use ($userId) {
+                      $subQ->where('user_id', $userId);
+                  });
+            })
             ->latest()
             ->paginate(10);
         

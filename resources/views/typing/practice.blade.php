@@ -21,7 +21,13 @@
                 </div>
                 <div class="card p-3 min-w-[100px] text-center bg-white shadow-sm border border-gray-100">
                     <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Time</p>
-                    <p class="text-2xl font-bold" :class="timeRemaining <= 30 && timeRemaining > 0 ? 'text-red-600' : 'text-gray-700'" x-text="formatTime(timeRemaining || timer)">00:00</p>
+                    <p class="text-2xl font-bold" 
+                       :class="{
+                           'text-red-600': timeRemaining <= 30 && timeRemaining > 0,
+                           'text-gray-700': timeRemaining > 30 || timeRemaining === 0,
+                           'animate-shake': timeRemaining <= 15 && timeRemaining > 0
+                       }" 
+                       x-text="formatTime(timeRemaining || timer)">00:00</p>
                 </div>
             </div>
         </div>
@@ -89,14 +95,20 @@
         <!-- Result Modal -->
         <div x-show="showResultModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" x-cloak>
             <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-500 via-secondary-500 to-primary-500"></div>
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r" :class="timeExpired ? 'from-red-500 via-orange-500 to-red-500' : 'from-primary-500 via-secondary-500 to-primary-500'"></div>
                 
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <!-- Time Expired Icon -->
+                <div x-show="timeExpired" class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-clock text-4xl text-red-600"></i>
+                </div>
+                
+                <!-- Success Icon -->
+                <div x-show="!timeExpired" class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i class="fas fa-trophy text-4xl text-green-600"></i>
                 </div>
                 
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">ยอดเยี่ยมมาก!</h2>
-                <p class="text-gray-500 mb-8">คุณพิมพ์เสร็จเรียบร้อยแล้ว</p>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" x-text="timeExpired ? 'หมดเวลาแล้ว!' : 'ยอดเยี่ยมมาก!'"></h2>
+                <p class="text-gray-500 mb-8" x-text="timeExpired ? 'เวลาของคุณหมดแล้ว นี่คือผลคะแนนของคุณ' : 'คุณพิมพ์เสร็จเรียบร้อยแล้ว'"></p>
                 
                 <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="p-4 bg-gray-50 rounded-xl">
@@ -137,6 +149,7 @@
                 isFocused: false,
                 isSubmitting: false,
                 showResultModal: false,
+                timeExpired: false,
                 
                 timer: 0,
                 timerInterval: null,
@@ -269,7 +282,7 @@
                             // Auto-finish when time is up
                             if (this.timeRemaining <= 0) {
                                 this.timeRemaining = 0;
-                                this.finishGame();
+                                this.finishGame(true); // true = time expired
                                 return;
                             }
                         }
@@ -290,8 +303,9 @@
                     }
                 },
                 
-                finishGame() {
+                finishGame(expired = false) {
                     this.isFinished = true;
+                    this.timeExpired = expired;
                     clearInterval(this.timerInterval);
                     this.showResultModal = true;
                     this.$refs.typingInput.blur();
@@ -303,7 +317,12 @@
                     this.isStarted = false;
                     this.isFinished = false;
                     this.showResultModal = false;
+                    this.timeExpired = false;
                     this.timer = 0;
+                    // Reset time remaining if time limit is set
+                    if (this.timeLimit && this.timeLimit > 0) {
+                        this.timeRemaining = this.timeLimit * 60;
+                    }
                     this.wpm = 0;
                     this.accuracy = 100;
                     this.totalKeystrokes = 0;
@@ -403,6 +422,25 @@
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
+        }
+        
+        /* Shake Animation */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .animate-shake {
+            animation: shake 0.5s;
+            animation-iteration-count: infinite;
         }
     </style>
 </x-typing-app>
