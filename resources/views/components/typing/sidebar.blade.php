@@ -70,6 +70,11 @@
                 <i class="fas fa-paper-plane w-5 text-center"></i>
                 <span>งานที่ส่งแล้ว</span>
             </a>
+
+            <a href="{{ url('/typing/student/matches') }}" class="sidebar-link {{ request()->is('typing/student/matches*') ? 'active' : '' }}">
+                <i class="fas fa-gamepad w-5 text-center"></i>
+                <span>1v1 แข่งพิมพ์งาน</span>
+            </a>
             
             <p class="px-4 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">ผลการเรียน</p>
             

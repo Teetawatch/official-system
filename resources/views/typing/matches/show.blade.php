@@ -1,7 +1,5 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="h-screen flex flex-col pt-16" x-data="typingMatch(@js($match))">
+<x-typing-app :role="'student'" :title="'1v1 Competition'">
+    <div class="h-screen flex flex-col -m-4 md:-m-6 lg:-m-8" x-data="typingMatch(@js($match))">
     <!-- Header / HUD -->
     <div class="bg-white border-b border-gray-200 shadow-sm z-10">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
@@ -384,4 +382,4 @@
         animation: bounce-in 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
     }
 </style>
-@endsection
+</x-typing-app>

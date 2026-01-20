@@ -1,9 +1,7 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="min-h-screen bg-gray-50 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
+<x-typing-app :role="'student'" :title="'1v1 แข่งพิมพ์งาน'">
+    <div class="min-h-screen bg-gray-50 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
             <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
                 <span class="block text-indigo-600 mb-2">1v1 Typing Battle</span>
                 <span class="block text-2xl text-gray-500 font-medium">ท้าดวลความเร็วในการพิมพ์แบบเรียลไทม์</span>
@@ -153,4 +151,4 @@
         matchStatus.classList.add('hidden');
     }
 </script>
-@endsection
+</x-typing-app>
