@@ -93,7 +93,7 @@ class DocxGradingService
         // Use LCS for character-level comparison
         $lcsLength = $this->computeCharacterLCSLength($masterChars, $submittedChars);
         $correctChars = $lcsLength;
-        
+
         // Calculate character-level metrics
         $wrongChars = $totalMasterChars - $correctChars;
         $missingChars = max(0, $totalMasterChars - $totalSubmittedChars);
@@ -107,7 +107,7 @@ class DocxGradingService
         $masterWords = preg_split('/\s+/u', $masterNormalized, -1, PREG_SPLIT_NO_EMPTY);
         $totalMasterWords = count($masterWords);
         $totalSubmittedWords = count($submittedWords);
-        
+
         // Count exact word matches
         $correctWords = 0;
         $minWords = min($totalMasterWords, $totalSubmittedWords);
@@ -145,11 +145,11 @@ class DocxGradingService
     {
         $m = count($master);
         $n = count($submitted);
-        
+
         // Use space-optimized DP (only keep 2 rows)
         $prev = array_fill(0, $n + 1, 0);
         $curr = array_fill(0, $n + 1, 0);
-        
+
         for ($i = 1; $i <= $m; $i++) {
             for ($j = 1; $j <= $n; $j++) {
                 if ($master[$i - 1] === $submitted[$j - 1]) {
@@ -165,7 +165,7 @@ class DocxGradingService
             // Reset curr for next iteration
             $curr = array_fill(0, $n + 1, 0);
         }
-        
+
         return $prev[$n];
     }
 
@@ -181,10 +181,10 @@ class DocxGradingService
     {
         $m = count($master);
         $n = count($submitted);
-        
+
         // Build LCS length table
         $dp = array_fill(0, $m + 1, array_fill(0, $n + 1, 0));
-        
+
         for ($i = 1; $i <= $m; $i++) {
             for ($j = 1; $j <= $n; $j++) {
                 if ($this->wordsMatch($master[$i - 1], $submitted[$j - 1])) {
@@ -194,12 +194,12 @@ class DocxGradingService
                 }
             }
         }
-        
+
         // Backtrack to find the actual LCS
         $lcs = [];
         $i = $m;
         $j = $n;
-        
+
         while ($i > 0 && $j > 0) {
             if ($this->wordsMatch($master[$i - 1], $submitted[$j - 1])) {
                 array_unshift($lcs, [
@@ -215,12 +215,14 @@ class DocxGradingService
                 $j--;
             }
         }
-        
+
         return $lcs;
     }
 
     /**
-     * Check if two words match with tolerance for minor differences.
+     * Check if two words match.
+     * STRICT MODE: Words must match exactly after normalization.
+     * No tolerance for typos or similar characters.
      *
      * @param string $word1
      * @param string $word2
@@ -232,51 +234,57 @@ class DocxGradingService
         if ($word1 === $word2) {
             return true;
         }
-        
+
         // Normalize both words and compare
         $normalized1 = $this->normalizeWord($word1);
         $normalized2 = $this->normalizeWord($word2);
-        
+
         if ($normalized1 === $normalized2) {
             return true;
         }
-        
-        // Check similarity for very close matches (handles minor typos)
-        // Only apply to words longer than 3 characters
-        if (mb_strlen($normalized1) > 3 && mb_strlen($normalized2) > 3) {
-            $similarity = 0;
-            similar_text($normalized1, $normalized2, $similarity);
-            // 95% similarity threshold for longer words
-            if ($similarity >= 95) {
-                return true;
-            }
-        }
-        
+
+        // STRICT MODE: No similarity tolerance
+        // Previously allowed 95% similarity for words > 3 characters
+        // Now words must match exactly - no tolerance for typos
+        // (Commented out for reference:)
+        // if (mb_strlen($normalized1) > 3 && mb_strlen($normalized2) > 3) {
+        //     $similarity = 0;
+        //     similar_text($normalized1, $normalized2, $similarity);
+        //     if ($similarity >= 95) {
+        //         return true;
+        //     }
+        // }
+
         return false;
     }
 
     /**
      * Normalize a single word for comparison.
+     * STRICT MODE: Only removes invisible characters and normalizes Unicode.
+     * Case and punctuation are preserved for exact matching.
      *
      * @param string $word
      * @return string
      */
     private function normalizeWord(string $word): string
     {
-        // Convert to lowercase for non-Thai characters
-        $word = mb_strtolower($word, 'UTF-8');
-        
+        // STRICT MODE: Do NOT convert to lowercase
+        // Case must match exactly
+        // (Previously: $word = mb_strtolower($word, 'UTF-8');)
+
         // Remove zero-width characters and other invisible Unicode characters
+        // These are invisible and users cannot control them
         $word = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $word);
-        
-        // Normalize Unicode (NFC normalization)
+
+        // Normalize Unicode (NFC normalization) - essential for Thai
         if (class_exists('Normalizer')) {
             $word = \Normalizer::normalize($word, \Normalizer::NFC);
         }
-        
-        // Remove leading/trailing punctuation for comparison
-        $word = preg_replace('/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/u', '', $word);
-        
+
+        // STRICT MODE: Do NOT remove leading/trailing punctuation
+        // Punctuation must match exactly
+        // (Previously: $word = preg_replace('/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/u', '', $word);)
+
         return trim($word);
     }
 
@@ -293,10 +301,10 @@ class DocxGradingService
         $details = [];
         $lcsIndex = 0;
         $submittedIndex = 0;
-        
+
         for ($masterIndex = 0; $masterIndex < count($masterWords); $masterIndex++) {
             $masterWord = $masterWords[$masterIndex];
-            
+
             // Check if this master word is in the LCS
             if ($lcsIndex < count($lcs) && $lcs[$lcsIndex]['master_pos'] === $masterIndex) {
                 // Found in LCS - it's a correct match
@@ -323,7 +331,7 @@ class DocxGradingService
                     $submittedIndex++;
                     $foundWrong = true;
                 }
-                
+
                 if (!$foundWrong) {
                     $details[] = [
                         'position' => $masterIndex + 1,
@@ -334,7 +342,7 @@ class DocxGradingService
                 }
             }
         }
-        
+
         // Add any extra words from submission
         while ($submittedIndex < count($submittedWords)) {
             // Check if this word is already accounted for in LCS
@@ -345,7 +353,7 @@ class DocxGradingService
                     break;
                 }
             }
-            
+
             if (!$isInLcs) {
                 $details[] = [
                     'position' => count($masterWords) + 1,
@@ -356,7 +364,7 @@ class DocxGradingService
             }
             $submittedIndex++;
         }
-        
+
         return $details;
     }
 
@@ -374,27 +382,38 @@ class DocxGradingService
 
     /**
      * Normalize text for comparison.
+     * STRICT MODE: Preserves exact spacing and line breaks.
+     * Only normalizes Unicode and removes invisible characters.
      */
     private function normalizeText(string $text): string
     {
         // Normalize Unicode (NFC normalization for consistent Thai character representation)
+        // This is essential for Thai language to compare correctly
         if (class_exists('Normalizer')) {
             $text = \Normalizer::normalize($text, \Normalizer::NFC);
         }
-        
-        // Remove zero-width characters and other invisible Unicode characters
-        $text = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}\x{00A0}]/u', ' ', $text);
-        
-        // Convert to single line breaks
+
+        // Remove ONLY zero-width characters and other invisible Unicode characters
+        // These are characters users cannot see or control
+        // Replace with empty string (not space) to avoid affecting spacing
+        $text = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text);
+
+        // Convert non-breaking space to regular space (users can't distinguish these)
+        $text = preg_replace('/\x{00A0}/u', ' ', $text);
+
+        // Normalize line breaks to \n (different OS use different line breaks)
+        // This is essential for cross-platform compatibility
         $text = preg_replace('/\r\n|\r/', "\n", $text);
-        
-        // Replace multiple spaces/tabs with single space
-        $text = preg_replace('/[ \t]+/', ' ', $text);
-        
-        // Replace multiple line breaks with single
-        $text = preg_replace('/\n+/', "\n", $text);
-        
-        // Trim whitespace
+
+        // STRICT MODE: Do NOT collapse multiple spaces
+        // Students must type exact number of spaces as the original
+        // (Previously: $text = preg_replace('/[ \t]+/', ' ', $text);)
+
+        // STRICT MODE: Do NOT collapse multiple line breaks
+        // Students must match exact line breaks as the original
+        // (Previously: $text = preg_replace('/\n+/', "\n", $text);)
+
+        // Trim only leading/trailing whitespace from the entire text
         $text = trim($text);
 
         return $text;
@@ -414,13 +433,13 @@ class DocxGradingService
     {
         $submittedText = $this->extractText($filePath);
         $comparison = $this->compareTexts($submittedText, $masterText);
-        
+
         // Text accuracy score (if formatting check enabled, this is 70% weight)
         $textAccuracy = $comparison['accuracy'];
-        
+
         // Check numeral format consistency
         $numeralCheck = $this->compareNumeralFormats($submittedText, $masterText);
-        
+
         $result = [
             'score' => 0,
             'accuracy' => $textAccuracy,
@@ -440,19 +459,19 @@ class DocxGradingService
             if ($masterFilePath && file_exists($masterFilePath)) {
                 $rules = $this->extractFormattingRulesFromFile($masterFilePath);
             }
-            
+
             $formattingResult = $this->checkFormatting($filePath, $rules);
-            
+
             // Determine expected numeral type from rules (master file) or from comparison
             $expectedNumeralType = $rules['numeral_type'] ?? null;
-            $expectedNumeralLabel = match($expectedNumeralType) {
+            $expectedNumeralLabel = match ($expectedNumeralType) {
                 'thai' => 'เลขไทย',
                 'arabic' => 'เลขอารบิก',
                 'mixed' => 'เลขไทยและเลขอารบิก',
                 'none' => 'ไม่มีตัวเลข',
                 default => $numeralCheck['master_type'],
             };
-            
+
             // Add numeral check to formatting checks
             $formattingResult['checks'][] = [
                 'element' => 'numeral_format',
@@ -461,19 +480,19 @@ class DocxGradingService
                 'actual' => $numeralCheck['submitted_type'],
                 'passed' => $numeralCheck['passed'],
             ];
-            
+
             // Update formatting score with numeral check
             if ($numeralCheck['passed']) {
                 $formattingResult['passed']++;
             }
             $formattingResult['total']++;
-            $formattingResult['score'] = $formattingResult['total'] > 0 
-                ? round(($formattingResult['passed'] / $formattingResult['total']) * 100, 2) 
+            $formattingResult['score'] = $formattingResult['total'] > 0
+                ? round(($formattingResult['passed'] / $formattingResult['total']) * 100, 2)
                 : 0;
-            
+
             $result['formatting'] = $formattingResult;
             $result['formatting_score'] = $formattingResult['score'];
-            
+
             // Combined score: 70% text + 30% formatting
             $combinedAccuracy = ($textAccuracy * 0.7) + ($formattingResult['score'] * 0.3);
             $result['combined_accuracy'] = round($combinedAccuracy, 2);
@@ -493,13 +512,13 @@ class DocxGradingService
     {
         $extracted = $this->extractFormatting($filePath);
         $masterText = $this->extractText($filePath);
-        
+
         // Detect header labels from master file (bold texts that match common headers)
         $detectedHeaders = [];
         $headerFontSize = 16; // default
         $commonHeaders = ['ส่วนราชการ', 'ที่', 'วันที่', 'เรื่อง', 'เรียน', 'อ้างถึง', 'สิ่งที่ส่งมาด้วย'];
         $boldTexts = $extracted['bold_texts'] ?? [];
-        
+
         foreach ($boldTexts as $boldItem) {
             foreach ($commonHeaders as $header) {
                 if (strpos($boldItem['text'], $header) !== false) {
@@ -513,7 +532,7 @@ class DocxGradingService
                 }
             }
         }
-        
+
         // Detect title formatting (บันทึกข้อความ or similar)
         $titleFontSize = 29; // default
         $titleFound = false;
@@ -526,7 +545,7 @@ class DocxGradingService
                 break;
             }
         }
-        
+
         // Detect numeral type from master text
         $hasThaiNumerals = $this->containsThaiNumerals($masterText);
         $hasArabicNumerals = $this->containsArabicNumerals($masterText);
@@ -538,47 +557,47 @@ class DocxGradingService
         } elseif ($hasArabicNumerals) {
             $numeralType = 'arabic';
         }
-        
+
         // Convert first line indent from twips to cm
         $indentTwips = $extracted['primary_indent'] ?? 0;
         $indentCm = $indentTwips > 0 ? round($indentTwips / 567, 1) : 2.5;
-        
+
         // Determine line spacing
         $lineSpacing = $extracted['primary_line_spacing'] ?? 1.0;
-        
+
         // Build comprehensive rules from extracted formatting
         return [
             // Font settings (from master file)
             'font_name' => $extracted['primary_font'] ?? 'TH SarabunPSK',
             'font_size' => $extracted['primary_font_size'] ?? 16,
-            
+
             // Page margins (from master file)
             'margin_top' => isset($extracted['margins']['top']) ? round($extracted['margins']['top'], 1) : 2.5,
             'margin_left' => isset($extracted['margins']['left']) ? round($extracted['margins']['left'], 1) : 3.0,
             'margin_bottom' => isset($extracted['margins']['bottom']) ? round($extracted['margins']['bottom'], 1) : 2.0,
             'margin_right' => isset($extracted['margins']['right']) ? round($extracted['margins']['right'], 1) : 2.0,
-            
+
             // Paper settings (from master file)
             'paper_size' => $extracted['paper_size'] ?? 'A4',
             'orientation' => $extracted['orientation'] ?? 'portrait',
-            
+
             // Paragraph settings (from master file)
             'alignment' => $extracted['primary_alignment'] ?? 'both',
             'first_line_indent' => $indentCm, // in cm
             'line_spacing' => is_numeric($lineSpacing) ? $lineSpacing : 1.0,
-            
+
             // Title settings (from master file)
             'title_font_size' => $titleFontSize,
             'title_bold' => true,
-            
+
             // Header labels (detected from master file)
             'header_labels' => !empty($detectedHeaders) ? $detectedHeaders : ['ส่วนราชการ', 'ที่', 'วันที่', 'เรื่อง'],
             'header_font_size' => $headerFontSize,
             'header_bold' => true,
-            
+
             // Numeral type (from master file)
             'numeral_type' => $numeralType,
-            
+
             // Store all fonts found for reference
             'all_fonts' => $extracted['fonts'] ?? [],
             'all_font_sizes' => $extracted['font_sizes'] ?? [],
@@ -596,28 +615,28 @@ class DocxGradingService
             // Font settings
             'font_name' => 'TH SarabunPSK',
             'font_size' => 16, // points for body text
-            
+
             // Title settings (บันทึกข้อความ)
             'title_font_size' => 29, // pt
             'title_bold' => true,
             'title_spacing_before' => 6, // points
             'title_line_spacing' => 35, // exact line spacing in points
-            
+
             // Page margins (in cm, converted to twips for comparison)
             'margin_top' => 2.5,    // cm
             'margin_left' => 3.0,   // cm
             'margin_bottom' => 2.0, // cm
             'margin_right' => 2.0,  // cm
-            
+
             // Paper size
             'paper_size' => 'A4',
             'orientation' => 'portrait',
-            
+
             // Paragraph settings
             'first_line_indent' => 2.5, // cm (previously in twips, now in cm for consistency)
             'line_spacing' => 1.0, // single line spacing
             'alignment' => 'both', // justify
-            
+
             // Header labels (ส่วนราชการ, ที่, วันที่, เรื่อง) - must be bold, 20pt
             'header_labels' => ['ส่วนราชการ', 'ที่', 'วันที่', 'เรื่อง'],
             'header_font_size' => 20, // pt
@@ -632,7 +651,7 @@ class DocxGradingService
     public function extractFontsFromXml(string $filePath): array
     {
         $fonts = [];
-        
+
         // .docx files are ZIP archives
         $zip = new \ZipArchive();
         if ($zip->open($filePath) !== true) {
@@ -648,7 +667,7 @@ class DocxGradingService
             if (!empty($matches[2])) {
                 $fonts = array_merge($fonts, $matches[2]);
             }
-            
+
             // Also look for font definitions in run properties
             preg_match_all('/<w:rFonts[^\/]*\/>/', $documentXml, $fontElements);
             foreach ($fontElements[0] as $fontElement) {
@@ -668,7 +687,7 @@ class DocxGradingService
                 $fonts = array_merge($fonts, $matches[2]);
             }
         }
-        
+
         // Read fontTable.xml for all defined fonts
         $fontTableXml = $zip->getFromName('word/fontTable.xml');
         if ($fontTableXml) {
@@ -679,10 +698,10 @@ class DocxGradingService
         }
 
         $zip->close();
-        
+
         // Filter out empty values and deduplicate
         $fonts = array_filter(array_unique($fonts));
-        
+
         return array_values($fonts);
     }
 
@@ -702,7 +721,7 @@ class DocxGradingService
         $lineSpacings = [];
         $alignments = [];
         $boldTexts = [];
-        
+
         // Page/Section settings
         $margins = [];
         $paperSize = null;
@@ -715,14 +734,14 @@ class DocxGradingService
                 $fonts[] = $defaultFont;
             }
         }
-        
+
         if (method_exists($phpWord, 'getDefaultFontSize')) {
             $defaultSize = $phpWord->getDefaultFontSize();
             if ($defaultSize) {
                 $fontSizes[] = $defaultSize;
             }
         }
-        
+
         // Try to get fonts from document settings
         if (method_exists($phpWord, 'getSettings')) {
             $settings = $phpWord->getSettings();
@@ -736,7 +755,7 @@ class DocxGradingService
                 }
             }
         }
-        
+
         // Also try extracting fonts directly from XML (most reliable method)
         $xmlFonts = $this->extractFontsFromXml($filePath);
         $fonts = array_merge($fonts, $xmlFonts);
@@ -752,7 +771,7 @@ class DocxGradingService
                     'bottom' => $sectionStyle->getMarginBottom() / 567,
                     'right' => $sectionStyle->getMarginRight() / 567,
                 ];
-                
+
                 // Paper size
                 $pageWidth = $sectionStyle->getPageSizeW();
                 $pageHeight = $sectionStyle->getPageSizeH();
@@ -767,7 +786,7 @@ class DocxGradingService
                     }
                 }
             }
-            
+
             foreach ($section->getElements() as $element) {
                 $this->extractFormattingFromElement($element, $fonts, $fontSizes, $indents, $lineSpacings, $alignments, $boldTexts);
             }
@@ -829,43 +848,43 @@ class DocxGradingService
             $fontStyle = $element->getFontStyle();
             if ($fontStyle && is_object($fontStyle)) {
                 $fontName = null;
-                
+
                 // Try multiple methods to get font name
                 if (method_exists($fontStyle, 'getName')) {
                     $fontName = $fontStyle->getName();
                 }
-                
+
                 // Try getHint (for theme fonts)
                 if (!$fontName && method_exists($fontStyle, 'getHint')) {
                     $fontName = $fontStyle->getHint();
                 }
-                
+
                 // Try getAscii (ASCII font name)
                 if (!$fontName && method_exists($fontStyle, 'getAscii')) {
                     $fontName = $fontStyle->getAscii();
                 }
-                
+
                 // Try getEastAsia (East Asian font name - often used for Thai)
                 if (!$fontName && method_exists($fontStyle, 'getEastAsia')) {
                     $fontName = $fontStyle->getEastAsia();
                 }
-                
+
                 // Try getComplexScript (Complex script font - used for Thai, Arabic, etc.)
                 if (!$fontName && method_exists($fontStyle, 'getComplexScript')) {
                     $fontName = $fontStyle->getComplexScript();
                 }
-                
+
                 if ($fontName) {
                     $fonts[] = $fontName;
                 }
-                
+
                 if (method_exists($fontStyle, 'getSize')) {
                     $fontSize = $fontStyle->getSize();
                     if ($fontSize) {
                         $fontSizes[] = $fontSize;
                     }
                 }
-                
+
                 // Check for bold text
                 if (method_exists($fontStyle, 'isBold') && $fontStyle->isBold()) {
                     if (method_exists($element, 'getText')) {
@@ -909,7 +928,7 @@ class DocxGradingService
     {
         $rules = $rules ?? $this->getDefaultFormattingRules();
         $extracted = $this->extractFormatting($filePath);
-        
+
         $checks = [];
         $passedCount = 0;
         $totalChecks = 0;
@@ -919,10 +938,11 @@ class DocxGradingService
         $expectedFont = $rules['font_name'];
         $actualFont = $extracted['primary_font'];
         $fontPassed = $actualFont && (
-            stripos($actualFont, 'Sarabun') !== false || 
+            stripos($actualFont, 'Sarabun') !== false ||
             stripos($actualFont, 'TH Sarabun') !== false
         );
-        if ($fontPassed) $passedCount++;
+        if ($fontPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'font_name',
             'label' => 'ชื่อฟอนต์',
@@ -936,7 +956,8 @@ class DocxGradingService
         $expectedSize = $rules['font_size'];
         $actualSize = $extracted['primary_font_size'];
         $sizePassed = $actualSize && abs($actualSize - $expectedSize) <= 2; // Allow 2pt tolerance
-        if ($sizePassed) $passedCount++;
+        if ($sizePassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'font_size',
             'label' => 'ขนาดฟอนต์เนื้อหา',
@@ -947,13 +968,14 @@ class DocxGradingService
 
         // Check Page Margins
         $margins = $extracted['margins'] ?? [];
-        
+
         // Top margin
         $totalChecks++;
         $expectedTop = $rules['margin_top'] ?? 2.5;
         $actualTop = $margins['top'] ?? 0;
         $topPassed = abs($actualTop - $expectedTop) <= 0.3; // 0.3cm tolerance
-        if ($topPassed) $passedCount++;
+        if ($topPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'margin_top',
             'label' => 'ระยะขอบบน',
@@ -967,7 +989,8 @@ class DocxGradingService
         $expectedLeft = $rules['margin_left'] ?? 3.0;
         $actualLeft = $margins['left'] ?? 0;
         $leftPassed = abs($actualLeft - $expectedLeft) <= 0.3;
-        if ($leftPassed) $passedCount++;
+        if ($leftPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'margin_left',
             'label' => 'ระยะขอบซ้าย',
@@ -981,7 +1004,8 @@ class DocxGradingService
         $expectedBottom = $rules['margin_bottom'] ?? 2.0;
         $actualBottom = $margins['bottom'] ?? 0;
         $bottomPassed = abs($actualBottom - $expectedBottom) <= 0.3;
-        if ($bottomPassed) $passedCount++;
+        if ($bottomPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'margin_bottom',
             'label' => 'ระยะขอบล่าง',
@@ -995,7 +1019,8 @@ class DocxGradingService
         $expectedRight = $rules['margin_right'] ?? 2.0;
         $actualRight = $margins['right'] ?? 0;
         $rightPassed = abs($actualRight - $expectedRight) <= 0.3;
-        if ($rightPassed) $passedCount++;
+        if ($rightPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'margin_right',
             'label' => 'ระยะขอบขวา',
@@ -1009,7 +1034,8 @@ class DocxGradingService
         $expectedPaper = $rules['paper_size'] ?? 'A4';
         $actualPaper = $extracted['paper_size'];
         $paperPassed = $actualPaper === $expectedPaper;
-        if ($paperPassed) $passedCount++;
+        if ($paperPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'paper_size',
             'label' => 'ขนาดกระดาษ',
@@ -1023,7 +1049,8 @@ class DocxGradingService
         $expectedOrient = $rules['orientation'] ?? 'portrait';
         $actualOrient = $extracted['orientation'];
         $orientPassed = $actualOrient === $expectedOrient;
-        if ($orientPassed) $passedCount++;
+        if ($orientPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'orientation',
             'label' => 'แนวกระดาษ',
@@ -1036,7 +1063,7 @@ class DocxGradingService
         $boldTexts = $extracted['bold_texts'] ?? [];
         $titleFound = false;
         $titleSizeCorrect = false;
-        
+
         foreach ($boldTexts as $boldItem) {
             if (strpos($boldItem['text'], 'บันทึกข้อความ') !== false) {
                 $titleFound = true;
@@ -1047,16 +1074,17 @@ class DocxGradingService
                 break;
             }
         }
-        
+
         $totalChecks++;
         $titlePassed = $titleFound && $titleSizeCorrect;
-        if ($titlePassed) $passedCount++;
+        if ($titlePassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'title_format',
             'label' => 'หัวเรื่อง "บันทึกข้อความ"',
             'expected' => 'ตัวหนา, ' . ($rules['title_font_size'] ?? 29) . ' pt',
-            'actual' => $titleFound ? 
-                ($titleSizeCorrect ? 'ตัวหนา, ขนาดถูกต้อง' : 'ตัวหนา, ขนาดไม่ถูกต้อง') : 
+            'actual' => $titleFound ?
+                ($titleSizeCorrect ? 'ตัวหนา, ขนาดถูกต้อง' : 'ตัวหนา, ขนาดไม่ถูกต้อง') :
                 'ไม่พบ',
             'passed' => $titlePassed,
         ];
@@ -1066,7 +1094,8 @@ class DocxGradingService
         $expectedAlign = $rules['alignment'];
         $actualAlign = $extracted['primary_alignment'];
         $alignPassed = $actualAlign && ($actualAlign === $expectedAlign || $actualAlign === 'both' || $actualAlign === 'justify');
-        if ($alignPassed) $passedCount++;
+        if ($alignPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'alignment',
             'label' => 'การจัดข้อความ',
@@ -1082,7 +1111,8 @@ class DocxGradingService
         // Convert twips to cm: 1 cm = 567 twips
         $actualIndentCm = $actualIndentTwips > 0 ? $actualIndentTwips / 567 : 0;
         $indentPassed = abs($actualIndentCm - $expectedIndent) <= 0.3; // 0.3cm tolerance
-        if ($indentPassed) $passedCount++;
+        if ($indentPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'first_line_indent',
             'label' => 'ระยะย่อหน้าแรก',
@@ -1112,7 +1142,8 @@ class DocxGradingService
                 }
             }
         }
-        if ($lineSpacingPassed) $passedCount++;
+        if ($lineSpacingPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'line_spacing',
             'label' => 'ระยะห่างบรรทัด',
@@ -1125,10 +1156,10 @@ class DocxGradingService
         $headerLabels = $rules['header_labels'] ?? ['ส่วนราชการ', 'ที่', 'วันที่', 'เรื่อง'];
         $expectedHeaderSize = $rules['header_font_size'] ?? 20;
         $boldTextsForHeaders = $extracted['bold_texts'] ?? [];
-        
+
         $foundLabels = [];
         $correctLabels = [];
-        
+
         foreach ($headerLabels as $label) {
             foreach ($boldTextsForHeaders as $boldItem) {
                 if (strpos($boldItem['text'], $label) !== false) {
@@ -1141,15 +1172,16 @@ class DocxGradingService
                 }
             }
         }
-        
+
         $totalChecks++;
         $headersPassed = count($correctLabels) >= count($headerLabels);
-        if ($headersPassed) $passedCount++;
+        if ($headersPassed)
+            $passedCount++;
         $checks[] = [
             'element' => 'header_labels',
             'label' => 'หัวข้อเอกสาร (ส่วนราชการ/ที่/วันที่/เรื่อง)',
             'expected' => 'ตัวหนา, ' . $expectedHeaderSize . ' pt',
-            'actual' => count($foundLabels) > 0 
+            'actual' => count($foundLabels) > 0
                 ? 'พบ ' . count($correctLabels) . '/' . count($headerLabels) . ' หัวข้อถูกต้อง'
                 : 'ไม่พบหัวข้อ',
             'passed' => $headersPassed,
@@ -1171,7 +1203,7 @@ class DocxGradingService
      */
     private function translateAlignment(?string $alignment): string
     {
-        return match($alignment) {
+        return match ($alignment) {
             'left' => 'ชิดซ้าย',
             'right' => 'ชิดขวา',
             'center' => 'กึ่งกลาง',
@@ -1190,22 +1222,22 @@ class DocxGradingService
         $masterHasArabic = $this->containsArabicNumerals($masterText);
         $submittedHasThai = $this->containsThaiNumerals($submittedText);
         $submittedHasArabic = $this->containsArabicNumerals($submittedText);
-        
+
         $passed = true;
         $details = [];
-        
+
         // If master uses Thai numerals, submitted should too
         if ($masterHasThai && !$submittedHasThai && $submittedHasArabic) {
             $passed = false;
             $details[] = 'ต้นฉบับใช้เลขไทย แต่งานที่ส่งใช้เลขอารบิก';
         }
-        
+
         // If master uses Arabic numerals, submitted should too
         if ($masterHasArabic && !$submittedHasArabic && $submittedHasThai) {
             $passed = false;
             $details[] = 'ต้นฉบับใช้เลขอารบิก แต่งานที่ส่งใช้เลขไทย';
         }
-        
+
         // Detect what type of numerals are used
         $masterType = 'ไม่มีตัวเลข';
         if ($masterHasThai && $masterHasArabic) {
@@ -1215,7 +1247,7 @@ class DocxGradingService
         } elseif ($masterHasArabic) {
             $masterType = 'เลขอารบิก';
         }
-        
+
         $submittedType = 'ไม่มีตัวเลข';
         if ($submittedHasThai && $submittedHasArabic) {
             $submittedType = 'เลขไทยและเลขอารบิก';
@@ -1224,7 +1256,7 @@ class DocxGradingService
         } elseif ($submittedHasArabic) {
             $submittedType = 'เลขอารบิก';
         }
-        
+
         return [
             'passed' => $passed,
             'master_type' => $masterType,

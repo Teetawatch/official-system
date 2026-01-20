@@ -31,7 +31,7 @@ class TournamentController extends Controller
             'status' => 'open',
         ]);
 
-        return redirect()->route('tournaments.index')->with('success', 'Tournament created!');
+        return redirect()->route('typing.tournaments.index')->with('success', 'Tournament created!');
     }
 
     public function join($id)
@@ -59,7 +59,7 @@ class TournamentController extends Controller
             $this->startTournament($tournament);
         }
 
-        return redirect()->route('tournaments.show', $tournament->id)->with('success', 'Joined successfully!');
+        return redirect()->route('typing.tournaments.show', $tournament->id)->with('success', 'Joined successfully!');
     }
 
     public function show($id)
