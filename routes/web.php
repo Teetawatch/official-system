@@ -99,6 +99,14 @@ Route::prefix('typing')->name('typing.')->group(function () {
                 // File Upload Routes
                 Route::get('/upload/{id}', [App\Http\Controllers\TypingController::class, 'showUpload'])->name('upload');
                 Route::post('/upload/{id}', [App\Http\Controllers\TypingController::class, 'storeUpload'])->name('upload.submit');
+
+                // 1v1 Match Routes
+                Route::get('/matches', [App\Http\Controllers\TypingMatchController::class, 'index'])->name('matches.index');
+                Route::post('/matches/find', [App\Http\Controllers\TypingMatchController::class, 'findMatch'])->name('matches.find');
+                Route::get('/matches/{id}', [App\Http\Controllers\TypingMatchController::class, 'show'])->name('matches.show');
+                Route::get('/matches/{id}/status', [App\Http\Controllers\TypingMatchController::class, 'status'])->name('matches.status');
+                Route::post('/matches/{id}/progress', [App\Http\Controllers\TypingMatchController::class, 'updateProgress'])->name('matches.progress');
+                Route::post('/matches/{id}/finish', [App\Http\Controllers\TypingMatchController::class, 'finish'])->name('matches.finish');
             });
         
         // Shared Routes
