@@ -21,8 +21,8 @@
             {{-- Admin Menu --}}
             <p class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">เมนูหลัก</p>
 
-            <a href="{{ url('/typing/admin/dashboard') }}"
-                class="sidebar-link {{ request()->is('typing/admin/dashboard') ? 'active' : '' }}">
+            <a href="{{ route('typing.admin.dashboard') }}"
+                class="sidebar-link {{ request()->routeIs('typing.admin.dashboard') ? 'active' : '' }}">
                 <i class="fas fa-home w-5 text-center"></i>
                 <span>แดชบอร์ด</span>
             </a>
