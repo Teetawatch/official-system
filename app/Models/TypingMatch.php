@@ -27,6 +27,8 @@ class TypingMatch extends Model
         'tournament_id', // Added this line
         'round',         // Added this line
         'bracket_index', // Added this line
+        'player1_ready',
+        'player2_ready',
     ];
 
     protected $casts = [

@@ -116,7 +116,7 @@
         <div class="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center relative z-10">
 
             <!-- Waiting Overlay -->
-            <div x-show="!started"
+            <div x-show="!started && !countdown"
                 class="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center transition-all duration-500">
                 <div
                     class="bg-[#1e293b] p-10 rounded-2xl shadow-2xl border border-gray-700 text-center max-w-sm mx-4 relative overflow-hidden">
@@ -133,12 +133,30 @@
                             VS</div>
                     </div>
 
-                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">SEARCHING...</h3>
-                    <p class="text-gray-400 mb-4">กำลังค้นหาคู่ต่อสู้ที่เหมาะสม</p>
+                    <h3 class="text-2xl font-black text-white mb-2 tracking-tight">WAITING...</h3>
+                    <p class="text-gray-400 mb-4">รอผู้เล่นทุกคนพร้อม... (<span x-text="readyCount">0</span>/2)</p>
                     
-                    <button @click="leaveMatch()" class="text-red-400 hover:text-red-300 text-sm font-medium underline transition-colors">
-                        ยกเลิกการค้นหา
+                    <div class="flex gap-4 justify-center text-xs font-mono text-gray-500">
+                         <div :class="player1.ready ? 'text-green-400' : 'text-gray-500'">YOU Given</div>
+                         <div :class="player2 && player2.ready ? 'text-green-400' : 'text-gray-500'">OPPONENT</div>
+                    </div>
+
+                    <button @click="leaveMatch()" class="mt-4 text-red-400 hover:text-red-300 text-sm font-medium underline transition-colors">
+                        ออกจากการแข่งขัน
                     </button>
+                </div>
+            </div>
+
+            <!-- Countdown Overlay -->
+            <div x-show="countdown > 0" 
+                class="absolute inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center pointer-events-none"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-150">
+                <div class="text-center">
+                    <div class="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-yellow-600 animate-pulse drop-shadow-[0_0_30px_rgba(234,179,8,0.5)]"
+                         x-text="countdown">3</div>
+                    <div class="text-white font-bold text-2xl mt-4 tracking-widest uppercase">Get Ready</div>
                 </div>
             </div>
             
@@ -269,7 +287,17 @@
                     avatar: '{{ auth()->user()->avatar_url }}',
                     progress: 0,
                     wpm: 0,
-                    accuracy: 100
+                    accuracy: 100,
+                    ready: initialMatch.player1_ready || false
+                },
+                
+                countdown: 0,
+
+                get readyCount() {
+                    let count = 0;
+                    if (this.player1.ready) count++;
+                    if (this.player2 && this.player2.ready) count++;
+                    return count;
                 },
 
                 player2: null,
@@ -304,7 +332,18 @@
                     }
 
                     if (this.started) {
-                        this.$nextTick(() => this.$refs.input.focus());
+                        // Check if we are still in countdown
+                        if (initialMatch.started_at) {
+                             const start = new Date(initialMatch.started_at).getTime();
+                             const now = Date.now(); // We don't have server time yet, approximate
+                             if (start > now) {
+                                 this.countdown = Math.ceil((start - now) / 1000);
+                             } else {
+                                this.$nextTick(() => this.$refs.input.focus());
+                             }
+                        } else {
+                           this.$nextTick(() => this.$refs.input.focus());
+                        }
                     }
 
                     this.pollStatus();
@@ -340,9 +379,19 @@
                             name: opponentData.name,
                             avatar: opponentData.avatar_url || opponentData.avatar,
                             progress: opponentProgress,
-                            wpm: opponentWpm || 0
+                            wpm: opponentWpm || 0,
+                            ready: opponentData.ready || false
                         };
                     }
+                },
+
+                startInput() {
+                    if (this.finished) return;
+                    this.startTime = Date.now();
+                    this.$nextTick(() => {
+                        this.$refs.input.disabled = false;
+                        this.$refs.input.focus();
+                    });
                 },
 
                 async leaveMatch() {
@@ -366,7 +415,7 @@
                 },
 
                 handleInput(e) {
-                    if (!this.started || this.finished) return;
+                    if (!this.started || this.finished || this.countdown > 0) return;
 
                     const inputVal = e.target.value;
                     const charTyped = inputVal.slice(-1);
@@ -434,14 +483,17 @@
                                         name: data.player2.name,
                                         avatar: data.player2.avatar,
                                         progress: data.player2.progress,
-                                        wpm: data.player2.wpm
+                                        wpm: data.player2.wpm,
+                                        ready: data.player2.ready
                                     };
                                 } else {
+                                    this.player2.ready = data.player2.ready;
                                     this.player2.progress = data.player2.progress;
                                     this.player2.wpm = data.player2.wpm;
                                 }
                             }
                         } else {
+                            this.player1.ready = data.player1.ready; // Update my ready status if I just refreshed
                             if (data.player1) {
                                 if (!this.player2) {
                                     this.player2 = {
@@ -449,22 +501,52 @@
                                         name: data.player1.name,
                                         avatar: data.player1.avatar,
                                         progress: data.player1.progress,
-                                        wpm: data.player1.wpm
+                                        wpm: data.player1.wpm,
+                                        ready: data.player1.ready
                                     };
                                 } else {
+                                    this.player2.ready = data.player1.ready;
                                     this.player2.progress = data.player1.progress;
                                     this.player2.wpm = data.player1.wpm;
                                 }
                             }
                         }
 
-                        if (data.status === 'ongoing' && !this.started) {
-                            this.started = true;
-                            this.startTime = Date.now();
-                            this.$nextTick(() => {
-                                this.$refs.input.disabled = false;
-                                this.$refs.input.focus();
-                            });
+                        if (data.status === 'ongoing') {
+                            if (data.started_at && data.server_time) {
+                                const startAt = new Date(data.started_at).getTime();
+                                const serverNow = data.server_time;
+                                const diff = startAt - serverNow;
+                                
+                                if (diff > 0) {
+                                    this.countdown = Math.ceil(diff / 1000);
+                                    this.started = true;
+                                    if (this.$refs.input) this.$refs.input.blur();
+                                } else {
+                                    const wasCountingDown = this.countdown > 0;
+                                    this.countdown = 0;
+                                    
+                                    if (!this.started || wasCountingDown) {
+                                        this.started = true;
+                                        // Only start input if we haven't already
+                                        if (!this.startTime || wasCountingDown) {
+                                            this.startTime = Date.now();
+                                            this.$nextTick(() => {
+                                                this.$refs.input.disabled = false;
+                                                this.$refs.input.focus();
+                                            });
+                                        }
+                                    }
+                                }
+                            } else if (!this.started) {
+                                // Fallback (no server time sync)
+                                this.started = true;
+                                this.startTime = Date.now();
+                                this.$nextTick(() => {
+                                    this.$refs.input.disabled = false;
+                                    this.$refs.input.focus();
+                                });
+                            }
                         }
 
                         if (data.status === 'completed' && !this.finished) {

@@ -47,7 +47,9 @@ class TypingMatchController extends Controller
             $pendingMatch->update([
                 'player2_id' => $user->id,
                 'status' => 'ongoing',
-                'started_at' => now(),
+                'started_at' => now()->addSeconds(5),
+                'player1_ready' => true,
+                'player2_ready' => true,
             ]);
 
             return response()->json([
@@ -126,15 +128,45 @@ class TypingMatchController extends Controller
     public function status($id)
     {
         $match = TypingMatch::with(['player1', 'player2', 'winner'])->findOrFail($id);
+        $user = Auth::user();
+
+        // Check Ready Status (Auto-Check-In)
+        if ($match->status === 'pending') {
+            $isPlayer1 = $match->player1_id === $user->id;
+            $isPlayer2 = $match->player2_id === $user->id;
+
+            if (($isPlayer1 && !$match->player1_ready) || ($isPlayer2 && !$match->player2_ready)) {
+                if ($isPlayer1) $match->player1_ready = true;
+                if ($isPlayer2) $match->player2_ready = true;
+                $match->save();
+            }
+
+            // Check if both ready to start
+            if ($match->player1_ready && $match->player2_ready) {
+                // Use transaction to ensure only one thread starts it
+                DB::transaction(function () use ($match) {
+                    $m = TypingMatch::lockForUpdate()->find($match->id);
+                    if ($m->status === 'pending') {
+                        $m->status = 'ongoing';
+                        $m->started_at = now()->addSeconds(5);
+                        $m->save();
+                    }
+                });
+                $match->refresh();
+            }
+        }
 
         return response()->json([
             'status' => $match->status,
+            'started_at' => $match->started_at,
+            'server_time' => now()->startOfSecond()->timestamp * 1000 + now()->milli, // Milliseconds
             'player1' => [
                 'id' => $match->player1->id,
                 'name' => $match->player1->name,
                 'progress' => $match->player1_progress,
                 'wpm' => $match->player1_wpm,
                 'avatar' => $match->player1->avatar_url,
+                'ready' => $match->player1_ready,
             ],
             'player2' => $match->player2 ? [
                 'id' => $match->player2->id,
@@ -142,6 +174,7 @@ class TypingMatchController extends Controller
                 'progress' => $match->player2_progress,
                 'wpm' => $match->player2_wpm,
                 'avatar' => $match->player2->avatar_url,
+                'ready' => $match->player2_ready,
             ] : null,
             'winner' => $match->winner ? $match->winner->name : null,
             'winner_id' => $match->winner_id,
@@ -162,9 +195,12 @@ class TypingMatchController extends Controller
         ];
 
         // Ensure status is ongoing if p2 just joined but status update lagged (rare race condition handling)
-        if ($match->status === 'pending' && $match->player2_id) {
-            $data['status'] = 'ongoing';
-            $data['started_at'] = now();
+        if ($match->status === 'pending' && $match->player2_id && $match->player1_ready && $match->player2_ready) {
+             // If we are here, status check didn't catch it yet, or race condition.
+             // We generally prefer the status check to handle start.
+             // But if we forced it here:
+             // $data['status'] = 'ongoing';
+             // $data['started_at'] = now()->addSeconds(5);
         }
 
         $match->update($data);
