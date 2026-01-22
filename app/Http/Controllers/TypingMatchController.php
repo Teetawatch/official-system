@@ -142,7 +142,8 @@ class TypingMatchController extends Controller
             }
 
             // Check if both ready to start
-            if ($match->player1_ready && $match->player2_ready) {
+            $p2Ready = $match->player2_id ? $match->player2_ready : true;
+            if ($match->player1_ready && $p2Ready) {
                 // Use transaction to ensure only one thread starts it
                 DB::transaction(function () use ($match) {
                     $m = TypingMatch::lockForUpdate()->find($match->id);

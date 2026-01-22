@@ -46,8 +46,16 @@
                     <!-- VS Badge / Timer -->
                     <div class="flex flex-col items-center justify-center px-8 relative">
                         <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full" x-show="!finished"></div>
+                        
+                        <!-- VS Badge (Only show if there is an opponent and no timer override) -->
                         <div class="text-4xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-400 transform -skew-x-12 relative z-10"
-                            x-show="!finished && !timeLimit">VS</div>
+                            x-show="!finished && !timeLimit && player2">VS</div>
+                        
+                        <!-- Solo Badge (If no opponent) -->
+                        <div class="text-2xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300 transform -skew-x-12 relative z-10"
+                            x-show="!finished && !timeLimit && !player2">SOLO</div>
+
+                        <!-- Timer (If time limit exists) -->
                         <div class="flex flex-col items-center" x-show="!finished && timeLimit">
                             <span class="text-xs text-gray-400 font-bold uppercase tracking-widest">Time</span>
                             <span class="text-3xl font-black text-white font-mono" 
@@ -140,11 +148,19 @@
                     </div>
 
                     <h3 class="text-2xl font-black text-white mb-2 tracking-tight">WAITING...</h3>
-                    <p class="text-gray-400 mb-4">รอผู้เล่นทุกคนพร้อม... (<span x-text="readyCount">0</span>/2)</p>
+                    
+                    <template x-if="player2">
+                        <p class="text-gray-400 mb-4">รอผู้เล่นทุกคนพร้อม... (<span x-text="readyCount">0</span>/2)</p>
+                    </template>
+                    <template x-if="!player2">
+                        <p class="text-gray-400 mb-4">กดปุ่มเริ่มเพื่อเริ่มการทดสอบ</p>
+                    </template>
                     
                     <div class="flex gap-4 justify-center text-xs font-mono text-gray-500">
-                         <div :class="player1.ready ? 'text-green-400' : 'text-gray-500'">YOU Given</div>
-                         <div :class="player2 && player2.ready ? 'text-green-400' : 'text-gray-500'">OPPONENT</div>
+                         <div :class="player1.ready ? 'text-green-400' : 'text-gray-500'">
+                             <span x-text="player2 ? 'YOU (' + player1.name + ')' : 'READY STATUS'"></span>
+                         </div>
+                         <div x-show="player2" :class="player2 && player2.ready ? 'text-green-400' : 'text-gray-500'">OPPONENT</div>
                     </div>
 
                     <button @click="leaveMatch()" class="mt-4 text-red-400 hover:text-red-300 text-sm font-medium underline transition-colors">
