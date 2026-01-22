@@ -47,7 +47,13 @@
                     <div class="flex flex-col items-center justify-center px-8 relative">
                         <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full" x-show="!finished"></div>
                         <div class="text-4xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-400 transform -skew-x-12 relative z-10"
-                            x-show="!finished">VS</div>
+                            x-show="!finished && !timeLimit">VS</div>
+                        <div class="flex flex-col items-center" x-show="!finished && timeLimit">
+                            <span class="text-xs text-gray-400 font-bold uppercase tracking-widest">Time</span>
+                            <span class="text-3xl font-black text-white font-mono" 
+                                  :class="timeLeft <= 10 ? 'text-red-500 animate-pulse' : ''"
+                                  x-text="formatTime(timeLeft)"></span>
+                        </div>
                         <div class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)] animate-bounce"
                             x-show="finished && winnerId == currentUserId">VICTORY!</div>
                         <div class="text-3xl font-black text-gray-500 drop-shadow-lg"
@@ -277,6 +283,9 @@
                 winnerId: initialMatch.winner_id,
                 isNewRecord: false,
                 startTime: initialMatch.started_at ? new Date(initialMatch.started_at).getTime() : null,
+                timeLimit: initialMatch.time_limit || null,
+                timeLeft: 0,
+                timerInterval: null,
 
                 // Identify Roles
                 myDbRole: (initialMatch.player1_id === {{ auth()->id() }}) ? 'player1' : 'player2',
@@ -347,7 +356,12 @@
                     }
 
                     this.pollStatus();
-                    this.pollInterval = setInterval(() => this.pollStatus(), 1000);
+                    this.pollInterval = setInterval(() => {
+                        this.pollStatus();
+                        if (this.started && !this.finished) { // Independent check
+                           this.checkTimeLimit();
+                        }
+                    }, 1000);
 
                     if (this.started && !this.startTime) {
                         this.startTime = Date.now();
@@ -609,6 +623,24 @@
                 handleGameEnd() {
                     if (this.winnerId == this.currentUserId) {
                         this.fireConfetti();
+                    }
+                },
+
+                formatTime(seconds) {
+                    if (seconds < 0) return '0:00';
+                    const m = Math.floor(seconds / 60);
+                    const s = seconds % 60;
+                    return `${m}:${s.toString().padStart(2, '0')}`;
+                },
+
+                checkTimeLimit() {
+                    if (!this.started || this.finished || !this.timeLimit || !this.startTime) return;
+
+                    const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.timeLeft = Math.max(0, this.timeLimit - elapsedSeconds);
+
+                    if (this.timeLeft <= 0) {
+                        this.finishGame();
                     }
                 },
 

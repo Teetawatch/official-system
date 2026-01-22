@@ -18,6 +18,8 @@ class Tournament extends Model
         'champion_id',
         'type',
         'scoring_config',
+        'custom_text',
+        'time_limit',
     ];
 
     protected $casts = [

@@ -75,6 +75,29 @@
                                :value="type === 'class_battle' ? 100 : 16">
                     </div>
 
+                    <!-- Game Settings -->
+                    <div class="mb-8 bg-gray-50 p-6 rounded-xl border border-gray-100">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <i class="fas fa-gamepad mr-2 text-primary-500"></i> ตั้งค่าการแข่งขัน (Game Settings)
+                        </h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">
+                                กำหนดบทความเอง (Custom Text)
+                                <span class="text-xs font-normal text-gray-500">(ถ้าไม่ใส่ จะสุ่มบทความให้)</span>
+                            </label>
+                            <textarea name="custom_text" rows="4" class="form-input w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="พิมพข้อความที่ต้องการใช้แข่งขันที่นี่..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">
+                                จำกัดเวลา (วินาที)
+                                <span class="text-xs font-normal text-gray-500">(ถ้าไม่ใส่ คือไม่จำกัดเวลา)</span>
+                            </label>
+                            <input type="number" name="time_limit" min="30" max="1800" class="form-input w-full md:w-1/2 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="เช่น 60, 120 (วินาที)">
+                        </div>
+                    </div>
+
                     <!-- Scoring Config (Only for Class Battle) -->
                     <div x-show="type === 'class_battle'" class="mb-8 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
                         <h3 class="font-bold text-indigo-800 mb-4 flex items-center">

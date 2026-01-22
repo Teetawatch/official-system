@@ -32,12 +32,16 @@ class TournamentController extends Controller
             'description' => 'required|string',
             'type' => 'required|in:bracket,class_battle',
             'max_participants' => 'required|integer|min:2',
+            'custom_text' => 'nullable|string|min:10',
+            'time_limit' => 'nullable|integer|min:30|max:1800',
         ]);
 
         $type = $request->input('type');
         $name = $request->input('name');
         $description = $request->input('description');
         $maxParticipants = $request->input('max_participants');
+        $customText = $request->input('custom_text');
+        $timeLimit = $request->input('time_limit');
 
         $scoringConfig = null;
         if ($type === 'class_battle') {
@@ -63,6 +67,8 @@ class TournamentController extends Controller
             'status' => 'open',
             'type' => $type,
             'scoring_config' => $scoringConfig,
+            'custom_text' => $customText,
+            'time_limit' => $timeLimit,
         ]);
 
         return redirect()->route('typing.tournaments.index')->with('success', 'Tournament created!');
@@ -133,7 +139,16 @@ class TournamentController extends Controller
         // Group matches by round for easy display in view
         $matchesByRound = $tournament->matches->groupBy('round');
 
-        return view('typing.tournaments.show', compact('tournament', 'matchesByRound'));
+        $nonParticipants = [];
+        if ($tournament->type === 'class_battle') {
+            $participantIds = $tournament->participants->pluck('id');
+            $nonParticipants = User::where('role', 'student')
+                                   ->whereNotIn('id', $participantIds)
+                                   ->orderBy('name')
+                                   ->get();
+        }
+
+        return view('typing.tournaments.show', compact('tournament', 'matchesByRound', 'nonParticipants'));
     }
 
     private function startTournament(Tournament $tournament)
@@ -146,17 +161,15 @@ class TournamentController extends Controller
             // Removed early return for class_battle as it's handled below
 
             $participants = $tournament->participants()->inRandomOrder()->get();
+            
+            // Determine text content: Custom or Random
+            $textContent = $tournament->custom_text;
+            if (empty($textContent)) {
+                $textContent = $this->getRandomText();
+            }
 
-            // Assuming 16 playes for now
             // Create Round 1 Matches
             if ($tournament->type === 'class_battle') {
-                $status = 'ongoing'; 
-                // In Class Battle, we might want them to start immediately or wait for countdown.
-                // Let's set them to ongoing.
-                
-                // Get a random text for the whole class
-                $textData = $this->getRandomText(); 
-
                 foreach ($participants as $p) {
                     TypingMatch::create([
                         'tournament_id' => $tournament->id,
@@ -164,42 +177,53 @@ class TournamentController extends Controller
                         'player2_id' => null, // Solo / Class Mode
                         'round' => 1,
                         'bracket_index' => 0,
-                        'status' => 'pending', // Pending so they can "Join" the room then we start sync? 
-                                               // Or just 'ongoing' and let them type? 
-                                               // User wants "Compete Together". Sync start is best.
-                        'language' => 'en', 
-                        'text_content' => $textData,
+                        'status' => 'pending', 
+                        'language' => 'th', // Default to 'th' or detect
+                        'text_content' => $textContent,
+                        'time_limit' => $tournament->time_limit,
                     ]);
                 }
-                
-                // For Class Battle, we rely on the specific Match controller logic 
-                // or we update the Tournament View to show a "Enter Race" button that redirects to their specific match.
                 return;
             }
 
-            // Assuming 16 playes for now
-            // Create Round 1 Matches
-            $matchCount = $participants->count() / 2;
+            // Bracket Logic
+            $matchCount = intval(ceil($participants->count() / 2));
 
             for ($i = 0; $i < $matchCount; $i++) {
-                $p1 = $participants[$i * 2];
-                $p2 = $participants[($i * 2) + 1];
+                $p1 = $participants[$i * 2] ?? null;
+                $p2 = $participants[($i * 2) + 1] ?? null;
 
-                TypingMatch::create([
-                    'tournament_id' => $tournament->id,
-                    'player1_id' => $p1->id,
-                    'player2_id' => $p2->id,
-                    'round' => 1,
-                    'bracket_index' => $i,
-                    'status' => 'pending',
-                    'language' => 'en', // Default or make configurable
-                    'text_content' => $this->getRandomText(),
-                ]);
+                if ($p1 && $p2) {
+                    TypingMatch::create([
+                        'tournament_id' => $tournament->id,
+                        'player1_id' => $p1->id,
+                        'player2_id' => $p2->id,
+                        'round' => 1,
+                        'bracket_index' => $i,
+                        'status' => 'pending',
+                        'language' => 'th', 
+                        'text_content' => $textContent,
+                        'time_limit' => $tournament->time_limit,
+                    ]);
+                } else if ($p1) {
+                    // Odd number of players, bye round or auto-win?
+                    // For now, let's just creating a pending match awaiting opponent or manual handling
+                    // Or simpler: create match with null ID and handle in view
+                     TypingMatch::create([
+                        'tournament_id' => $tournament->id,
+                        'player1_id' => $p1->id,
+                        'player2_id' => null,
+                        'round' => 1,
+                        'bracket_index' => $i,
+                        'status' => 'pending',
+                        'language' => 'th',
+                        'text_content' => $textContent,
+                        'time_limit' => $tournament->time_limit,
+                    ]);
+                }
             }
 
-            // Create placeholders for subsequent rounds if we want to show empty brackets?
-            // Or just render them dynamically in view.
-            // Let's create empty matches for R2, R3, R4 so IDs exist and structure is clear.
+            // Create placeholders for subsequent rounds
             $rounds = [
                 2 => 4, // QF
                 3 => 2, // SF
@@ -210,13 +234,18 @@ class TournamentController extends Controller
                 for ($i = 0; $i < $count; $i++) {
                     TypingMatch::create([
                         'tournament_id' => $tournament->id,
-                        'player1_id' => null, // Placeholder
+                        'player1_id' => null, 
                         'player2_id' => null,
                         'round' => $round,
                         'bracket_index' => $i,
                         'status' => 'pending',
-                        'language' => 'en',
-                        'text_content' => $this->getRandomText(),
+                        'language' => 'th',
+                        'text_content' => $textContent, // Usually upper rounds use different text? 
+                                                        // If custom text is set, do we reuse it? 
+                                                        // User asked to "set text", implying for the competition.
+                                                        // Let's use it for all rounds for consistency if set, 
+                                                        // OR we should probably generate new random text for upper rounds if NO custom text is set.
+                        'time_limit' => $tournament->time_limit,
                     ]);
                 }
             }

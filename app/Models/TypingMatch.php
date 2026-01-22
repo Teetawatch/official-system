@@ -29,6 +29,7 @@ class TypingMatch extends Model
         'bracket_index', // Added this line
         'player1_ready',
         'player2_ready',
+        'time_limit',
     ];
 
     protected $casts = [

@@ -87,6 +87,7 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">อันดับ</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ผู้เล่น</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">คะแนน</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ความเร็ว (WPM)</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">ความแม่นยำ</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">สถานะ</th>
@@ -94,7 +95,12 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @php
-                                $sortedMatches = $tournament->matches->sortByDesc('player1_wpm');
+                                // Sort: Completed (by Time), then Ongoing (by WPM), then Pending
+                                $completedMatches = $tournament->matches->where('status', 'completed')->sortBy('completed_at');
+                                $ongoingMatches = $tournament->matches->where('status', 'ongoing')->sortByDesc('player1_wpm');
+                                $pendingMatches = $tournament->matches->whereNotIn('status', ['completed', 'ongoing']);
+                                
+                                $sortedMatches = $completedMatches->concat($ongoingMatches)->concat($pendingMatches);
                                 $rank = 1;
                             @endphp
                             @forelse($sortedMatches as $match)
@@ -115,6 +121,29 @@
                                                 <div class="text-sm font-medium text-gray-900">{{ $match->player1->name }}</div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($match->status === 'completed')
+                                            @php
+                                                $points = 0;
+                                                $config = $tournament->scoring_config ?? ['first_place' => 100, 'second_place' => 90, 'third_place' => 80, 'decrement' => 2, 'min_points' => 10];
+                                                
+                                                if ($rank === 1) $points = intval($config['first_place'] ?? 100);
+                                                else if ($rank === 2) $points = intval($config['second_place'] ?? 90);
+                                                else if ($rank === 3) $points = intval($config['third_place'] ?? 80);
+                                                else {
+                                                    $base = intval($config['third_place'] ?? 80);
+                                                    $decr = intval($config['decrement'] ?? 2);
+                                                    $min = intval($config['min_points'] ?? 10);
+                                                    $points = max($min, $base - (($rank - 3) * $decr));
+                                                }
+                                            @endphp
+                                            <span class="px-2 py-1 text-xs font-bold rounded bg-yellow-100 text-yellow-800">
+                                                +{{ $points }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-bold text-gray-900">{{ $match->player1_wpm }}</div>
@@ -269,6 +298,27 @@
                     <div class="text-center p-3 rounded-xl bg-gray-50 hover:bg-primary-50 transition-colors">
                         <img src="{{ $participant->avatar_url }}" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-gray-200">
                         <p class="font-medium text-gray-800 text-sm truncate">{{ $participant->name }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Non-Participants List (Only for Admin/Teacher in Class Battle) -->
+    @if(isset($nonParticipants) && count($nonParticipants) > 0)
+    <div class="card mt-6 border-l-4 border-red-400">
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user-times text-red-500 mr-2"></i>
+                ยังไม่เข้าร่วม ({{ count($nonParticipants) }})
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @foreach($nonParticipants as $student)
+                    <div class="text-center p-3 rounded-xl bg-red-50 opacity-75 hover:opacity-100 transition-opacity">
+                        <img src="{{ $student->avatar_url }}" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border-2 border-red-200 grayscale">
+                        <p class="font-medium text-gray-800 text-sm truncate">{{ $student->name }}</p>
                     </div>
                 @endforeach
             </div>
