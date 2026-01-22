@@ -23,14 +23,14 @@ class TypingController extends Controller
         if (!$assignment->due_date) {
             return null;
         }
-        
+
         $dueDate = $assignment->due_date;
-        
+
         // If time is exactly 00:00:00, treat it as end of day
         if ($dueDate->format('H:i:s') === '00:00:00') {
             return $dueDate->copy()->endOfDay();
         }
-        
+
         return $dueDate;
     }
 
@@ -43,11 +43,11 @@ class TypingController extends Controller
     private function isDeadlinePassed($assignment): bool
     {
         $effectiveDeadline = $this->getEffectiveDeadline($assignment);
-        
+
         if (!$effectiveDeadline) {
             return false;
         }
-        
+
         return now()->greaterThan($effectiveDeadline);
     }
     /**
@@ -58,7 +58,7 @@ class TypingController extends Controller
         // In a real app, validation and authorization would go here.
         // For Phase 1-2 demo, we might mock data if DB is empty, 
         // but since we have DB tables now, let's try to use them or fallback to mock.
-        
+
         $assignment = TypingAssignment::findOrFail($id);
 
         return view('typing.practice', compact('assignment'));
@@ -70,48 +70,50 @@ class TypingController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        
+
         // Get user's submissions with scores
         $submissions = TypingSubmission::where('user_id', $user->id)
             ->with('assignment')
             ->whereNotNull('score')
             ->latest()
             ->get();
-        
+
         // Calculate stats
         $totalScore = $submissions->sum('score');
         $avgScore = $submissions->avg('score') ?? 0;
         $submittedCount = TypingSubmission::where('user_id', $user->id)->count();
         $totalAssignments = TypingAssignment::where('is_active', true)->count();
-        
+
         // Get pending assignments
         $pendingAssignments = TypingAssignment::where('is_active', true)
-            ->whereDoesntHave('submissions', function($q) use ($user) {
+            ->whereDoesntHave('submissions', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->latest()
             ->take(3)
             ->get();
-        
+
         // Get leaderboard (top 5)
         $leaderboard = User::where('role', 'student')
             ->withSum('typingSubmissions', 'score')
-            ->orderByDesc('points')
+            ->with(['equippedFrame', 'equippedNameColor']) // Eager load for mini leaderboard
+            ->orderByDesc('typing_submissions_sum_score')
             ->take(5)
             ->get();
-        
+
         // Get user rank
         $userRank = User::where('role', 'student')
-            ->orderByDesc('points')
+            ->withSum('typingSubmissions', 'score')
             ->get()
+            ->sortByDesc('typing_submissions_sum_score')
             ->values()
-            ->search(function($u) use ($user) {
+            ->search(function ($u) use ($user) {
                 return $u->id === $user->id;
             }) + 1;
-        
+
         $totalStudents = User::where('role', 'student')->count();
-        
-        
+
+
         // Prepare Chart Data (Last 10 graded submissions)
         $chartSubmissions = TypingSubmission::where('user_id', $user->id)
             ->whereNotNull('score')
@@ -121,14 +123,14 @@ class TypingController extends Controller
             ->sortBy('created_at'); // Sort by date ascending for chart
 
         $chartData = [
-            'labels' => $chartSubmissions->map(function($sub) {
+            'labels' => $chartSubmissions->map(function ($sub) {
                 return $sub->created_at->format('d/m');
             })->values(),
             'wpm' => $chartSubmissions->pluck('wpm')->values(),
             'accuracy' => $chartSubmissions->pluck('accuracy')->values(),
             'scores' => $chartSubmissions->pluck('score')->values(),
         ];
-        
+
         return view('typing.student.dashboard', compact(
             'user',
             'submissions',
@@ -150,36 +152,38 @@ class TypingController extends Controller
     public function assignments()
     {
         $userId = Auth::id();
-        
+
         $assignments = TypingAssignment::where('is_active', true)
-            ->with(['submissions' => function($query) use ($userId) {
-                $query->where('user_id', $userId);
-            }])
-            ->where(function($q) use ($userId) {
+            ->with([
+                'submissions' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }
+            ])
+            ->where(function ($q) use ($userId) {
                 // Show if:
                 // 1. Due date is not set (null) OR Future date
                 // 2. OR User has already submitted it (even if expired)
                 $q->whereNull('due_date')
-                  ->orWhere('due_date', '>=', now())
-                  ->orWhereHas('submissions', function($subQ) use ($userId) {
-                      $subQ->where('user_id', $userId);
-                  });
+                    ->orWhere('due_date', '>=', now())
+                    ->orWhereHas('submissions', function ($subQ) use ($userId) {
+                    $subQ->where('user_id', $userId);
+                });
             })
             ->latest()
             ->paginate(10);
-        
+
         // Calculate stats
         $totalAssignments = TypingAssignment::where('is_active', true)->count();
         $submittedCount = TypingSubmission::where('user_id', $userId)->count();
         $pendingCount = $totalAssignments - $submittedCount;
         $waitingGrade = TypingSubmission::where('user_id', $userId)->whereNull('score')->count();
         $gradedCount = TypingSubmission::where('user_id', $userId)->whereNotNull('score')->count();
-            
+
         return view('typing.student.assignments', compact(
-            'assignments', 
-            'totalAssignments', 
-            'pendingCount', 
-            'waitingGrade', 
+            'assignments',
+            'totalAssignments',
+            'pendingCount',
+            'waitingGrade',
             'gradedCount'
         ));
     }
@@ -191,9 +195,11 @@ class TypingController extends Controller
     {
         $userId = Auth::id(); // Fallback for dev
         $submissions = TypingSubmission::where('user_id', $userId)
-            ->with(['assignment' => function($query) {
-                $query->withTrashed();
-            }])
+            ->with([
+                'assignment' => function ($query) {
+                    $query->withTrashed();
+                }
+            ])
             ->latest()
             ->paginate(20);
 
@@ -209,7 +215,7 @@ class TypingController extends Controller
         $submission = TypingSubmission::where('user_id', $userId)
             ->with(['assignment'])
             ->findOrFail($id);
-            
+
         return view('typing.student.submission-detail', compact('submission'));
     }
 
@@ -220,35 +226,36 @@ class TypingController extends Controller
     {
         $user = Auth::user();
         $userId = $user->id;
-        
+
         $submissions = TypingSubmission::where('user_id', $userId)
             ->with(['assignment'])
             ->whereNotNull('score')
             ->latest()
             ->get();
-        
+
         // Calculate stats
         $totalScore = $submissions->sum('score');
         $avgScore = $submissions->avg('score') ?? 0;
         $avgWpm = $submissions->avg('wpm') ?? 0;
         $avgAccuracy = $submissions->avg('accuracy') ?? 0;
-        
+
         // Get user rank
         $userRank = User::where('role', 'student')
-            ->orderByDesc('points')
+            ->withSum('typingSubmissions', 'score')
             ->get()
+            ->sortByDesc('typing_submissions_sum_score')
             ->values()
-            ->search(function($u) use ($userId) {
+            ->search(function ($u) use ($userId) {
                 return $u->id === $userId;
             }) + 1;
-        
+
         $totalStudents = User::where('role', 'student')->count();
-        
+
         return view('typing.student.grades', compact(
-            'submissions', 
-            'totalScore', 
-            'avgScore', 
-            'avgWpm', 
+            'submissions',
+            'totalScore',
+            'avgScore',
+            'avgWpm',
             'avgAccuracy',
             'userRank',
             'totalStudents'
@@ -313,7 +320,7 @@ class TypingController extends Controller
     {
         $user = Auth::user();
         $totalAssignments = TypingAssignment::where('is_active', true)->count();
-        
+
         // Get all unique classes from students
         $classes = User::where('role', 'student')
             ->whereNotNull('class_name')
@@ -321,44 +328,44 @@ class TypingController extends Controller
             ->pluck('class_name')
             ->sort()
             ->values();
-        
+
         // Build query with filters
         $query = User::where('role', 'student')
             ->withSum('typingSubmissions', 'score')
             ->withCount('typingSubmissions')
-            ->with(['equippedFrame', 'equippedTheme', 'equippedTitle']);
-        
+            ->with(['equippedFrame', 'equippedTheme', 'equippedTitle', 'equippedNameColor', 'equippedProfileBg']);
+
         // Search filter
         $search = $request->input('search');
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('student_id', 'like', "%{$search}%");
+                    ->orWhere('student_id', 'like', "%{$search}%");
             });
         }
-        
+
         // Class filter
         $classFilter = $request->input('class');
         if ($classFilter && $classFilter !== 'all') {
             $query->where('class_name', $classFilter);
         }
-        
-        $students = $query->orderByDesc('points')
+
+        $students = $query->orderByDesc('typing_submissions_sum_score')
             ->paginate(20)
             ->withQueryString(); // Preserve query string for pagination
-        
+
         // Get top 3 for podium (always unfiltered)
         $top3 = User::where('role', 'student')
             ->withSum('typingSubmissions', 'score')
-            ->with(['equippedFrame', 'equippedTheme', 'equippedTitle'])
-            ->orderByDesc('points')
+            ->with(['equippedFrame', 'equippedTheme', 'equippedTitle', 'equippedNameColor', 'equippedProfileBg'])
+            ->orderByDesc('typing_submissions_sum_score')
             ->take(3)
             ->get();
-        
+
         return view('typing.leaderboard', compact(
-            'user', 
-            'students', 
-            'top3', 
+            'user',
+            'students',
+            'top3',
             'totalAssignments',
             'classes',
             'search',
@@ -372,17 +379,17 @@ class TypingController extends Controller
     public function showUpload($id)
     {
         $assignment = TypingAssignment::findOrFail($id);
-        
+
         // Check if assignment is file type
         if ($assignment->submission_type !== 'file') {
             return redirect()->route('typing.student.practice', $id);
         }
-        
+
         // Check if already submitted
         $existingSubmission = TypingSubmission::where('user_id', Auth::id())
             ->where('assignment_id', $id)
             ->first();
-        
+
         return view('typing.student.upload', compact('assignment', 'existingSubmission'));
     }
 
@@ -392,7 +399,7 @@ class TypingController extends Controller
     public function storeUpload(Request $request, $id)
     {
         $assignment = TypingAssignment::findOrFail($id);
-        
+
         // Validate file
         $request->validate([
             'file' => 'required|file|mimes:docx,pdf|max:10240', // Max 10MB
@@ -401,31 +408,31 @@ class TypingController extends Controller
         if ($this->isDeadlinePassed($assignment)) {
             return back()->withErrors(['file' => 'หมดเวลาส่งงานแล้ว (Deadline Exceeded)']);
         }
-        
+
         $userId = Auth::id();
-        
+
         // Check if already submitted
         $existingSubmission = TypingSubmission::where('user_id', $userId)
             ->where('assignment_id', $id)
             ->first();
-        
+
         if ($existingSubmission) {
             // Delete old file if exists
             if ($existingSubmission->file_path && file_exists(public_path($existingSubmission->file_path))) {
                 unlink(public_path($existingSubmission->file_path));
             }
         }
-        
+
         // Create directory if not exists
         $uploadPath = public_path('uploads/submissions');
         if (!file_exists($uploadPath)) {
             mkdir($uploadPath, 0755, true);
         }
-        
+
         // Generate unique filename
         $file = $request->file('file');
         $filename = 'submission_' . $userId . '_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        
+
         // Generate file hash for integrity check
         $tempPath = $file->getRealPath();
         $fileHash = md5_file($tempPath);
@@ -453,7 +460,7 @@ class TypingController extends Controller
 
         // Move file
         $file->move($uploadPath, $filename);
-        
+
         // Create or update submission
         $submissionData = [
             'user_id' => $userId,
@@ -466,19 +473,19 @@ class TypingController extends Controller
             'accuracy' => 0,
             'time_taken' => 0,
         ];
-        
+
         if ($existingSubmission) {
             $existingSubmission->update($submissionData);
             $submission = $existingSubmission;
         } else {
             $submission = TypingSubmission::create($submissionData);
         }
-        
+
         // Notify Admins
-        \App\Models\User::where('role', 'admin')->get()->each(function($admin) use ($submission) {
+        \App\Models\User::where('role', 'admin')->get()->each(function ($admin) use ($submission) {
             $admin->notify(new \App\Notifications\SubmissionReceived($submission));
         });
-        
+
         return redirect()->route('typing.student.assignments')
             ->with('success', 'อัปโหลดไฟล์เรียบร้อยแล้ว รอการตรวจจากอาจารย์');
     }

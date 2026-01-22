@@ -82,6 +82,22 @@
             <p class="text-2xl font-bold text-gray-800">{{ $stats['titles'] }}</p>
             <p class="text-sm text-gray-500">ตำแหน่งพิเศษ</p>
         </a>
+
+        <a href="{{ route('typing.shop.index', ['type' => 'name_color']) }}" class="card text-center group hover:shadow-lg transition-all {{ $type === 'name_color' ? 'ring-2 ring-indigo-500 bg-indigo-50' : '' }}">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i class="fas fa-font text-white text-lg"></i>
+            </div>
+            <p class="text-2xl font-bold text-gray-800">{{ $stats['name_colors'] }}</p>
+            <p class="text-sm text-gray-500">สีชื่อพิเศษ</p>
+        </a>
+
+        <a href="{{ route('typing.shop.index', ['type' => 'profile_bg']) }}" class="card text-center group hover:shadow-lg transition-all {{ $type === 'profile_bg' ? 'ring-2 ring-emerald-500 bg-emerald-50' : '' }}">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i class="fas fa-id-card text-white text-lg"></i>
+            </div>
+            <p class="text-2xl font-bold text-gray-800">{{ $stats['profile_bgs'] }}</p>
+            <p class="text-sm text-gray-500">พื้นหลังการ์ด</p>
+        </a>
         
         <a href="{{ route('typing.shop.my-rewards') }}" class="card text-center group hover:shadow-lg transition-all">
             <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
@@ -158,6 +174,33 @@
                                 <p class="px-4 py-2 rounded-full bg-gradient-to-r {{ $item->rarity_color }} text-white font-bold text-sm shadow-lg">
                                     {{ $item->name }}
                                 </p>
+                            </div>
+                        @elseif($item->type === 'name_color')
+                            <!-- Name Color Preview -->
+                            <div class="text-center">
+                                <div class="px-6 py-3 rounded-xl bg-gray-50 border border-gray-100 shadow-inner inline-block">
+                                    <span class="{{ $item->data['class'] ?? 'text-gray-800' }} text-xl">
+                                        {{ $user->name }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2">ตัวอย่างชื่อของคุณ</p>
+                            </div>
+                        @elseif($item->type === 'profile_bg')
+                            <!-- Profile BG Preview -->
+                            <div class="w-full h-28 rounded-xl {{ $item->data['class'] ?? 'bg-white' }} border border-gray-100 shadow-lg overflow-hidden flex flex-col p-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                                    <div class="h-2 w-16 bg-gray-200 rounded"></div>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="h-1.5 w-full bg-gray-100 rounded"></div>
+                                    <div class="h-1.5 w-3/4 bg-gray-100 rounded"></div>
+                                </div>
+                                @if($item->rarity === 'legendary')
+                                    <div class="mt-auto flex justify-end">
+                                        <i class="fas fa-star text-yellow-400 text-[10px]"></i>
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     </div>

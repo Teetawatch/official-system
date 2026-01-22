@@ -84,6 +84,8 @@ class RewardItem extends Model
             'avatar_frame' => 'กรอบอวาตาร์',
             'theme' => 'ธีมโปรไฟล์',
             'title' => 'ตำแหน่งพิเศษ',
+            'name_color' => 'สีชื่อพิเศษ',
+            'profile_bg' => 'พื้นหลังการ์ด',
             default => 'อื่นๆ',
         };
     }
@@ -97,6 +99,8 @@ class RewardItem extends Model
             'avatar_frame' => 'fa-circle-user',
             'theme' => 'fa-palette',
             'title' => 'fa-crown',
+            'name_color' => 'fa-font',
+            'profile_bg' => 'fa-id-card',
             default => 'fa-gift',
         };
     }

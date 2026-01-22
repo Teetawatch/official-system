@@ -83,10 +83,10 @@
                         @endif
                         <p class="font-bold text-sm md:text-base truncate relative z-10 {{ $ncClass2 }}">{{ $top3[1]->name }}</p>
                         <p class="text-xs opacity-90 relative z-10 mt-1">
-                            <i class="fas fa-trophy text-[10px] text-yellow-500 mr-1"></i>{{ number_format($top3[1]->points ?? 0) }} แต้ม
+                            <i class="fas fa-edit text-[10px] text-gray-200 mr-1"></i>{{ number_format($top3[1]->typing_submissions_sum_score ?? 0) }} คะแนน
                         </p>
                         <p class="text-[10px] opacity-70 relative z-10">
-                            งานส่ง: {{ number_format($top3[1]->typing_submissions_sum_score ?? 0) }}
+                            Battle แต้ม: {{ number_format($top3[1]->points ?? 0) }}
                         </p>
                     </div>
                 </div>
@@ -141,13 +141,13 @@
                                 </div>
                             @endif
                             <p class="font-bold text-base md:text-lg truncate {{ $ncClass1 }}">{{ $top3[0]->name }}</p>
-                            <div class="inline-block bg-white/20 rounded-lg px-2 py-1 mt-2">
+                             <div class="inline-block bg-white/20 rounded-lg px-2 py-1 mt-2">
                                 <p class="text-sm font-bold flex items-center justify-center gap-1">
-                                    <i class="fas fa-trophy text-yellow-200"></i>
-                                    {{ number_format($top3[0]->points ?? 0) }} แต้ม
+                                    <i class="fas fa-star text-yellow-200"></i>
+                                    {{ number_format($top3[0]->typing_submissions_sum_score ?? 0) }} คะแนน
                                 </p>
                             </div>
-                            <p class="text-[10px] opacity-80 mt-1">คะแนนงานส่ง: {{ number_format($top3[0]->typing_submissions_sum_score ?? 0) }}</p>
+                            <p class="text-[10px] opacity-80 mt-1 text-yellow-100">Battle แต้ม: {{ number_format($top3[0]->points ?? 0) }}</p>
                         </div>
                     </div>
                 </div>
@@ -201,10 +201,10 @@
                         @endif
                         <p class="font-bold text-sm md:text-base truncate relative z-10 {{ $ncClass3 }}">{{ $top3[2]->name }}</p>
                         <p class="text-xs opacity-90 relative z-10 mt-1">
-                            <i class="fas fa-trophy text-[10px] text-orange-400 mr-1"></i>{{ number_format($top3[2]->points ?? 0) }} แต้ม
+                            <i class="fas fa-edit text-[10px] text-orange-200 mr-1"></i>{{ number_format($top3[2]->typing_submissions_sum_score ?? 0) }} คะแนน
                         </p>
                         <p class="text-[10px] opacity-70 relative z-10">
-                            งานส่ง: {{ number_format($top3[2]->typing_submissions_sum_score ?? 0) }}
+                            Battle แต้ม: {{ number_format($top3[2]->points ?? 0) }}
                         </p>
                     </div>
                 </div>
@@ -369,12 +369,13 @@
                            </div>
                         </td>
                         <td class="py-4 px-4 text-right">
-                            <span class="text-sm font-bold text-gray-600">
+                            <span class="text-lg font-black {{ $rank <= 3 ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600' : 'text-blue-600' }}">
                                 {{ number_format($assignmentScore) }}
                             </span>
+                            <span class="text-[10px] text-gray-400 block -mt-1">คะแนน</span>
                         </td>
                         <td class="py-4 px-4 text-right">
-                            <span class="text-lg font-black {{ $rank <= 3 ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600' : 'text-indigo-600' }}">
+                            <span class="text-sm font-bold text-gray-500">
                                 {{ number_format($battlePoints) }}
                             </span>
                             <span class="text-[10px] text-gray-400 block -mt-1">แต้ม</span>

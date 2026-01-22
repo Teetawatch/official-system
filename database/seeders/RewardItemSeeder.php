@@ -252,8 +252,8 @@ class RewardItemSeeder extends Seeder
             ],
         ];
 
-        // ==================== NAME COLORS ====================
         $nameColors = [
+            // Common
             [
                 'name' => 'สีแดงเพลิง',
                 'description' => 'ชื่อสีแดงร้อนแรง',
@@ -263,6 +263,23 @@ class RewardItemSeeder extends Seeder
                 'data' => ['class' => 'text-red-500 font-bold'],
             ],
             [
+                'name' => 'สีฟ้าคราม',
+                'description' => 'ชื่อสีฟ้าสดใส สบายตา',
+                'type' => 'name_color',
+                'price' => 200,
+                'rarity' => 'common',
+                'data' => ['class' => 'text-blue-500 font-bold'],
+            ],
+            [
+                'name' => 'สีเขียวมรกต',
+                'description' => 'ชื่อสีเขียวเข้ม มีพลัง',
+                'type' => 'name_color',
+                'price' => 200,
+                'rarity' => 'common',
+                'data' => ['class' => 'text-emerald-500 font-bold'],
+            ],
+            // Rare
+            [
                 'name' => 'สีทองอร่าม',
                 'description' => 'ชื่อสีทองดุจทองคำ',
                 'type' => 'name_color',
@@ -271,20 +288,70 @@ class RewardItemSeeder extends Seeder
                 'data' => ['class' => 'text-amber-400 font-bold drop-shadow-sm'],
             ],
             [
-                'name' => 'สีรุ้ง',
-                'description' => 'ชื่อไล่เฉดสีรุ้งสุดเท่',
+                'name' => 'แสงสีฟ้าน้ำทะเล',
+                'description' => 'ชื่อเรืองแสงสีฟ้านุ่มนวล',
                 'type' => 'name_color',
-                'price' => 1000,
-                'rarity' => 'epic',
-                'data' => ['class' => 'bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent font-bold'],
+                'price' => 600,
+                'rarity' => 'rare',
+                'data' => ['class' => 'text-cyan-400 font-bold drop-shadow-[0_0_3px_rgba(34,211,238,0.8)]'],
             ],
             [
-                'name' => 'สีนีออนม่วง',
-                'description' => 'ชื่อเรืองแสงสีม่วง',
+                'name' => 'แสงสีชมพูหวาน',
+                'description' => 'ชื่อเรืองแสงสีชมพู',
+                'type' => 'name_color',
+                'price' => 600,
+                'rarity' => 'rare',
+                'data' => ['class' => 'text-pink-400 font-bold drop-shadow-[0_0_3px_rgba(244,114,182,0.8)]'],
+            ],
+            // Epic
+            [
+                'name' => 'นีออนม่วง',
+                'description' => 'ชื่อเรืองแสงสีม่วงสุดเท่',
                 'type' => 'name_color',
                 'price' => 1200,
                 'rarity' => 'epic',
-                'data' => ['class' => 'text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)] font-bold'],
+                'data' => ['class' => 'text-purple-400 font-bold drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]'],
+            ],
+            [
+                'name' => 'นีออนเขียวมะนาว',
+                'description' => 'ชื่อเรืองแสงสีเขียวมะนาว',
+                'type' => 'name_color',
+                'price' => 1200,
+                'rarity' => 'epic',
+                'data' => ['class' => 'text-lime-400 font-bold drop-shadow-[0_0_8px_rgba(163,230,53,0.8)]'],
+            ],
+            [
+                'name' => 'ไล่เฉดรุ้ง',
+                'description' => 'ชื่อไล่หน้าสีรุ้ง',
+                'type' => 'name_color',
+                'price' => 1500,
+                'rarity' => 'epic',
+                'data' => ['class' => 'bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent font-bold'],
+            ],
+            // Legendary
+            [
+                'name' => 'มหาเทพทองคำ',
+                'description' => 'ชื่อเรืองแสงทองคำสว่างจ้า',
+                'type' => 'name_color',
+                'price' => 3000,
+                'rarity' => 'legendary',
+                'data' => ['class' => 'text-yellow-400 font-extrabold drop-shadow-[0_0_12px_rgba(250,204,21,1)]'],
+            ],
+            [
+                'name' => 'ดวงดาวระยิบระยับ',
+                'description' => 'ชื่อสีเข้มพร้อมแสงสะท้อนสีเงิน',
+                'type' => 'name_color',
+                'price' => 3500,
+                'rarity' => 'legendary',
+                'data' => ['class' => 'bg-gradient-to-r from-slate-400 via-white to-slate-400 bg-clip-text text-transparent font-extrabold drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]'],
+            ],
+            [
+                'name' => 'หลุมดำจักรวาล',
+                'description' => 'ชื่อสีม่วงดำเรืองแสงลึกลับ',
+                'type' => 'name_color',
+                'price' => 4000,
+                'rarity' => 'legendary',
+                'data' => ['class' => 'text-indigo-900 font-extrabold drop-shadow-[0_0_10px_rgba(79,70,229,0.8)]'],
             ],
         ];
 
