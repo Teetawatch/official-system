@@ -108,6 +108,7 @@ Route::prefix('typing')->name('typing.')->group(function () {
                 Route::get('/matches/{id}/status', [App\Http\Controllers\TypingMatchController::class, 'status'])->name('matches.status');
                 Route::post('/matches/{id}/progress', [App\Http\Controllers\TypingMatchController::class, 'updateProgress'])->name('matches.progress');
                 Route::post('/matches/{id}/finish', [App\Http\Controllers\TypingMatchController::class, 'finish'])->name('matches.finish');
+                Route::post('/matches/cancel', [App\Http\Controllers\TypingMatchController::class, 'cancel'])->name('matches.cancel');
             });
 
         // Shared Routes

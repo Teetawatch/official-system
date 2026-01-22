@@ -63,6 +63,17 @@ class TypingMatchController extends Controller
                 "Success is not final, failure is not fatal: it is the courage to continue that counts. Believe you can and you're halfway there.",
                 "In the end, it's not the years in your life that count. It's the life in your years. Life is what happens when you're busy making other plans.",
                 "Technology is best when it brings people together. It has become appallingly obvious that our technology has exceeded our humanity.",
+                "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+                "Innovation distinguishes between a leader and a follower. Let's go invent tomorrow instead of worrying about what happened yesterday.",
+                "Software is a great combination between artistry and engineering. Code is poetry.",
+                "The function of good software is to make the complex appear to be simple.",
+                "First, solve the problem. Then, write the code.",
+                "Simplicity is the soul of efficiency. Good code is its own best documentation.",
+                "The impetuous nature of the reactive approach to programming often leads to a chaotic codebase. Structured paradigms enforce a discipline that yields software of superior robustness and maintainability.",
+                "Artificial intelligence is not a substitute for human intelligence; it is a tool to amplify human creativity and ingenuity. The true potential lies in the collaboration between man and machine.",
+                "The fundamental problem of communication is that of reproducing at one point either exactly or approximately a message selected at another point. Frequently the messages have meaning.",
+                "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
+                "Any fool can write code that a computer can understand. Good programmers write code that humans can understand. Refactoring is the key to maintainability.",
             ],
             'th' => [
                 "การศึกษาคือรากฐานสำคัญของการพัฒนาประเทศ เราต้องเรียนรู้และพัฒนาตนเองอยู่เสมอ เพื่อสร้างอนาคตที่ดีกว่า",
@@ -70,6 +81,17 @@ class TypingMatchController extends Controller
                 "ภาษาเป็นเครื่องมือสำคัญในการสื่อสาร การพิมพ์เร็วและแม่นยำจะช่วยให้เราทำงานได้อย่างมีประสิทธิภาพมากขึ้น",
                 "ประเทศไทยมีวัฒนธรรมอันงดงาม เราควรภูมิใจในความเป็นไทย และช่วยกันอนุรักษ์สิ่งดีงามเหล่านี้ไว้ให้ลูกหลาน",
                 "ความรู้ไม่มีวันหมด ยิ่งเรียนยิ่งรู้ว่ายังไม่รู้อะไรอีกมาก การเป็นผู้ใฝ่รู้จะทำให้เราเติบโตและก้าวหน้าในชีวิต",
+                "ความพยายามอยู่ที่ไหน ความสำเร็จอยู่ที่นั่น คำคมนี้ยังคงใช้ได้จริงเสมอในการดำเนินชีวิต",
+                "การเขียนโปรแกรมไม่ใช่เรื่องยาก ถ้าเรามีความตั้งใจและหมั่นฝึกฝนอยู่เสมอ",
+                "เทคโนโลยีใหม่ๆ เกิดขึ้นทุกวัน เราต้องปรับตัวและเรียนรู้อยู่ตลอดเวลาเพื่อไม่ให้ตกยุค",
+                "การตรงต่อเวลาเป็นคุณสมบัติที่ดีของคนทำงาน ไม่ว่าจะเป็นงานเล็กหรืองานใหญ่",
+                "สุขภาพเป็นเรื่องสำคัญ การทำงานหนักแต่ไม่ดูแลสุขภาพอาจส่งผลเสียในระยะยาวได้",
+                "การทำงานเป็นทีมช่วยให้งานสำเร็จได้เร็วขึ้น และได้ผลงานที่มีคุณภาพมากขึ้น",
+                "ปรัชญาเศรษฐกิจพอเพียงเป็นแนวทางการดำเนินชีวิตและการปฏิบัติตนของประชาชนในทุกระดับ ตั้งแต่ระดับครอบครัว ระดับชุมชน จนถึงระดับรัฐ ทั้งในการพัฒนาและบริหารประเทศให้ดำเนินไปในทางสายกลาง",
+                "การเปลี่ยนแปลงสภาพภูมิอากาศเป็นภัยคุกคามที่สำคัญที่สุดประการหนึ่งที่มนุษยชาติต้องเผชิญ อุณหภูมิเฉลี่ยของโลกที่เพิ่มสูงขึ้นอย่างต่อเนื่องส่งผลให้เกิดปรากฏการณ์ธรรมชาติที่รุนแรงและคาดเดาไม่ได้",
+                "ในยุคดิจิทัลที่ข้อมูลข่าวสารหลั่งไหลเข้ามาอย่างมหาศาล ทักษะการคิดวิเคราะห์และแยกแยะความถูกต้องของข้อมูลจึงมีความสำคัญอย่างยิ่ง เราต้องรู้จักตั้งคำถาม ตรวจสอบแหล่งที่มา และไม่เชื่อสิ่งใดง่ายๆ",
+                "การอนุรักษ์ทรัพยากรธรรมชาติและสิ่งแวดล้อมไม่ใช่หน้าที่ของใครคนใดคนหนึ่ง แต่เป็นความรับผิดชอบร่วมกันของทุกคนในสังคม การปรับเปลี่ยนพฤติกรรมเพียงเล็กน้อยในชีวิตประจำวันสามารถสร้างผลกระทบที่ยิ่งใหญ่ได้",
+                "ความรับผิดชอบต่อสังคมขององค์กรธุรกิจ คือแนวคิดที่ว่าบริษัทควรดำเนินกิจการโดยคำนึงถึงผลกระทบต่อผู้มีส่วนได้ส่วนเสียทุกฝ่าย ไม่ว่าจะเป็นพนักงาน ลูกค้า ชุมชน และสิ่งแวดล้อม",
             ],
         ];
 
@@ -299,5 +321,55 @@ class TypingMatchController extends Controller
             });
 
         return view('typing.matches.ranking', compact('topPlayers', 'myStats', 'recentMatches'));
+    }
+    /**
+     * Cancel or Surrender Match
+     */
+    public function cancel(Request $request)
+    {
+        $user = Auth::user();
+
+        // Find active match
+        $match = TypingMatch::where(function ($q) use ($user) {
+            $q->where('player1_id', $user->id)
+                ->orWhere('player2_id', $user->id);
+        })
+            ->whereIn('status', ['pending', 'ongoing'])
+            ->first();
+
+        if (!$match) {
+            return response()->json(['success' => true, 'message' => 'No active match found']);
+        }
+
+        // If waiting for opponent, just delete the match room
+        if ($match->status === 'pending') {
+            $match->delete();
+            return response()->json(['success' => true, 'action' => 'deleted']);
+        }
+
+        // If game started, it counts as surrender
+        if ($match->status === 'ongoing') {
+            $winnerId = ($match->player1_id === $user->id) ? $match->player2_id : $match->player1_id;
+
+            DB::transaction(function () use ($match, $user, $winnerId) {
+                $match->update([
+                    'status' => 'completed',
+                    'winner_id' => $winnerId,
+                    'completed_at' => now(),
+                ]);
+
+                if ($winnerId) {
+                    $winner = User::find($winnerId);
+                    $winner->increment('points', 50);
+                    $winner->increment('match_wins', 1);
+                }
+
+                $user->increment('match_losses', 1);
+            });
+
+            return response()->json(['success' => true, 'action' => 'surrendered']);
+        }
+
+        return response()->json(['success' => false]);
     }
 }

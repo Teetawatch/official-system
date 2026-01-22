@@ -52,16 +52,21 @@
                     </div>
 
                     <div id="match-status" class="hidden mb-6">
-                        <div class="flex items-center justify-center space-x-3 text-indigo-600">
-                            <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                </path>
-                            </svg>
-                            <span class="font-medium">กำลังค้นหาคู่ต่อสู้...</span>
+                        <div class="flex flex-col items-center justify-center space-y-3">
+                            <div class="flex items-center space-x-3 text-indigo-600">
+                                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                                <span class="font-medium">กำลังค้นหาคู่ต่อสู้...</span>
+                            </div>
+                            <button id="cancel-search-btn" class="text-sm text-red-500 hover:text-red-700 font-medium transition-colors border border-red-200 px-3 py-1 rounded-full hover:bg-red-50">
+                                ยกเลิกการค้นหา
+                            </button>
                         </div>
                     </div>
 
@@ -117,11 +122,37 @@
     <script>
         const findMatchBtn = document.getElementById('find-match-btn');
         const matchStatus = document.getElementById('match-status');
+        const cancelSearchBtn = document.getElementById('cancel-search-btn');
         const countdownDiv = document.getElementById('countdown');
         const countdownText = document.getElementById('countdown-text');
         const languageSelector = document.getElementById('language-selector');
         let matchId = null;
         let checkInterval = null;
+
+        cancelSearchBtn.addEventListener('click', async () => {
+            try {
+                // Stop polling
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                    checkInterval = null;
+                }
+
+                // Send cancel request
+                await fetch('{{ route('typing.student.matches.cancel') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                resetUI();
+
+            } catch (error) {
+                console.error('Error cancelling match:', error);
+                resetUI();
+            }
+        });
 
         findMatchBtn.addEventListener('click', async () => {
             // Get selected language

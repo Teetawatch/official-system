@@ -76,6 +76,11 @@
                                 class="relative h-14 w-14 rounded-full border-2 bg-gray-900 object-cover shadow-lg duration-300"
                                 :class="player2 ? 'border-red-500' : 'border-gray-600 animate-pulse'">
                         </div>
+                        
+                        <!-- Surrender Button -->
+                        <button @click="leaveMatch()" x-show="started && !finished" class="ml-4 text-gray-500 hover:text-red-500 transition-colors" title="Surrender / Leave">
+                            <i class="fas fa-sign-out-alt fa-lg"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -129,9 +134,15 @@
                     </div>
 
                     <h3 class="text-2xl font-black text-white mb-2 tracking-tight">SEARCHING...</h3>
-                    <p class="text-gray-400">กำลังค้นหาคู่ต่อสู้ที่เหมาะสม</p>
+                    <p class="text-gray-400 mb-4">กำลังค้นหาคู่ต่อสู้ที่เหมาะสม</p>
+                    
+                    <button @click="leaveMatch()" class="text-red-400 hover:text-red-300 text-sm font-medium underline transition-colors">
+                        ยกเลิกการค้นหา
+                    </button>
                 </div>
             </div>
+            
+
 
             <!-- Game Completed Overlay -->
             <div x-show="finished"
@@ -212,17 +223,13 @@
                 <!-- Text Display -->
                 <div class="relative text-2xl md:text-3xl leading-relaxed font-mono mb-8 select-none font-medium"
                     style="min-height: 140px;">
-                    <!-- Ghost text -->
-                    <div class="absolute inset-0 text-gray-700 pointer-events-none break-words whitespace-pre-wrap"
-                        x-text="targetText"></div>
-
-                    <!-- Review/Active text -->
+                    <!-- Review/Active text (Unified Layer) -->
                     <div class="relative break-words whitespace-pre-wrap">
                         <span
                             class="text-gray-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] transition-colors duration-100"
                             x-text="completedText"></span><span
-                            class="bg-indigo-500/30 text-indigo-200 rounded px-0.5 border-b-2 border-indigo-500 animate-pulse"
-                            x-text="currentChar"></span><span class="text-transparent" x-text="remainingText"></span>
+                            class="bg-indigo-500/30 text-indigo-200 rounded border-b-2 border-indigo-500 animate-pulse"
+                            x-text="currentChar"></span><span class="text-gray-700" x-text="remainingText"></span>
                     </div>
                 </div>
 
@@ -335,6 +342,26 @@
                             progress: opponentProgress,
                             wpm: opponentWpm || 0
                         };
+                    }
+                },
+
+                async leaveMatch() {
+                    if (this.started && !this.finished) {
+                        if (!confirm('คุณต้องการยอมแพ้การแข่งขันนี้ใช่หรือไม่?')) return;
+                    }
+
+                    try {
+                        await fetch('{{ route('typing.student.matches.cancel') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        window.location.href = "{{ route('typing.student.matches.index') }}";
+                    } catch (e) {
+                        console.error(e);
                     }
                 },
 
