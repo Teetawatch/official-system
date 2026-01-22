@@ -95,6 +95,7 @@ class TypingController extends Controller
         
         // Get leaderboard (top 5)
         $leaderboard = User::where('role', 'student')
+            ->withSum('typingSubmissions', 'score')
             ->orderByDesc('points')
             ->take(5)
             ->get();
@@ -323,6 +324,7 @@ class TypingController extends Controller
         
         // Build query with filters
         $query = User::where('role', 'student')
+            ->withSum('typingSubmissions', 'score')
             ->withCount('typingSubmissions')
             ->with(['equippedFrame', 'equippedTheme', 'equippedTitle']);
         
@@ -347,6 +349,7 @@ class TypingController extends Controller
         
         // Get top 3 for podium (always unfiltered)
         $top3 = User::where('role', 'student')
+            ->withSum('typingSubmissions', 'score')
             ->with(['equippedFrame', 'equippedTheme', 'equippedTitle'])
             ->orderByDesc('points')
             ->take(3)
