@@ -94,21 +94,21 @@
                             $avgScore = $student->typingSubmissions->count() > 0 ? $student->typingSubmissions->avg('score') : 0;
 
                             // Calculate grade
-                            $grade = 'F';
-                            if ($avgScore >= 80)
-                                $grade = 'A';
-                            elseif ($avgScore >= 75)
-                                $grade = 'B+';
-                            elseif ($avgScore >= 70)
-                                $grade = 'B';
-                            elseif ($avgScore >= 65)
-                                $grade = 'C+';
-                            elseif ($avgScore >= 60)
-                                $grade = 'C';
-                            elseif ($avgScore >= 55)
-                                $grade = 'D+';
-                            elseif ($avgScore >= 50)
-                                $grade = 'D';
+                            $grade = '0';
+                            if ($totalScore >= 80)
+                                $grade = '4';
+                            elseif ($totalScore >= 75)
+                                $grade = '3.5';
+                            elseif ($totalScore >= 70)
+                                $grade = '3';
+                            elseif ($totalScore >= 65)
+                                $grade = '2.5';
+                            elseif ($totalScore >= 60)
+                                $grade = '2';
+                            elseif ($totalScore >= 55)
+                                $grade = '1.5';
+                            elseif ($totalScore >= 50)
+                                $grade = '1';
                         @endphp
                         <tr class="{{ $rank <= 3 ? 'bg-amber-50/50' : '' }}">
                             <td class="text-center">
@@ -133,7 +133,8 @@
                                     <div>
                                         <p class="font-medium text-gray-800">{{ $student->name }}</p>
                                         <p class="text-xs text-gray-500">{{ $student->student_id }} •
-                                            {{ $student->class_name }}</p>
+                                            {{ $student->class_name }}
+                                        </p>
                                     </div>
                                 </div>
                             </td>
@@ -174,13 +175,21 @@
                             </td>
                             <td class="text-center bg-gray-50">
                                 @php
-                                    $badgeClass = 'badge-danger';
-                                    if (in_array($grade, ['A']))
+                                    $badgeClass = 'px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-white';
+                                    if ($grade == '4')
                                         $badgeClass = 'badge-secondary';
-                                    elseif (in_array($grade, ['B+', 'B']))
+                                    elseif ($grade == '3.5')
                                         $badgeClass = 'badge-primary';
-                                    elseif (in_array($grade, ['C+', 'C']))
+                                    elseif ($grade == '3')
                                         $badgeClass = 'badge-warning';
+                                    elseif ($grade == '2.5')
+                                        $badgeClass = 'px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700';
+                                    elseif ($grade == '2')
+                                        $badgeClass = 'badge-danger';
+                                    elseif ($grade == '1.5')
+                                        $badgeClass = 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700';
+                                    elseif ($grade == '1')
+                                        $badgeClass = 'px-2 py-1 text-xs font-medium rounded-full bg-red-200 text-red-800';
                                 @endphp
                                 <span class="{{ $badgeClass }}">{{ $grade }}</span>
                             </td>
@@ -198,7 +207,8 @@
         <!-- Pagination -->
         <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-100">
             <p class="text-sm text-gray-500">แสดง {{ $students->firstItem() ?? 0 }}-{{ $students->lastItem() ?? 0 }} จาก
-                {{ $students->total() }} รายการ</p>
+                {{ $students->total() }} รายการ
+            </p>
             {{ $students->links() }}
         </div>
     </div>
@@ -212,35 +222,35 @@
         <div class="flex flex-wrap gap-4">
             <div class="flex items-center gap-2">
                 <span class="badge-secondary">4</span>
-                <span class="text-sm text-gray-600">80-100%</span>
+                <span class="text-sm text-gray-600">80-100 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="badge-primary">3.5</span>
-                <span class="text-sm text-gray-600">75-79%</span>
+                <span class="text-sm text-gray-600">75-79 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="badge-warning">3</span>
-                <span class="text-sm text-gray-600">70-74%</span>
+                <span class="text-sm text-gray-600">70-74 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">2.5</span>
-                <span class="text-sm text-gray-600">65-69%</span>
+                <span class="text-sm text-gray-600">65-69 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="badge-danger">2</span>
-                <span class="text-sm text-gray-600">60-64%</span>
+                <span class="text-sm text-gray-600">60-64 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">1.5</span>
-                <span class="text-sm text-gray-600">55-59%</span>
+                <span class="text-sm text-gray-600">55-59 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-200 text-red-800">1</span>
-                <span class="text-sm text-gray-600">50-54%</span>
+                <span class="text-sm text-gray-600">50-54 คะแนน</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-700 text-white">0</span>
-                <span class="text-sm text-gray-600">0-49%</span>
+                <span class="text-sm text-gray-600">0-49 คะแนน</span>
             </div>
         </div>
     </div>
