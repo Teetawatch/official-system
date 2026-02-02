@@ -80,6 +80,19 @@ Route::prefix('typing')->name('typing.')->group(function () {
                 Route::get('/submissions/export/zip', [App\Http\Controllers\TypingAdminController::class, 'exportSubmissionsZip'])->name('submissions.export.zip');
                 Route::post('/submissions/{id}/auto-grade', [App\Http\Controllers\TypingAdminController::class, 'autoGradeSubmission'])->name('submissions.autograde');
                 Route::post('/submissions/auto-grade-all/{assignmentId}', [App\Http\Controllers\TypingAdminController::class, 'autoGradeAllSubmissions'])->name('submissions.autograde.all');
+
+                // Template Library Routes (Admin)
+                Route::prefix('templates')->name('templates.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\TemplateLibraryController::class, 'adminIndex'])->name('index');
+                    Route::get('/create', [App\Http\Controllers\TemplateLibraryController::class, 'create'])->name('create');
+                    Route::post('/', [App\Http\Controllers\TemplateLibraryController::class, 'store'])->name('store');
+                    Route::get('/{id}/edit', [App\Http\Controllers\TemplateLibraryController::class, 'edit'])->name('edit');
+                    Route::put('/{id}', [App\Http\Controllers\TemplateLibraryController::class, 'update'])->name('update');
+                    Route::delete('/{id}', [App\Http\Controllers\TemplateLibraryController::class, 'destroy'])->name('destroy');
+                    Route::get('/{id}/download', [App\Http\Controllers\TemplateLibraryController::class, 'download'])->name('download');
+                    Route::post('/{id}/toggle-featured', [App\Http\Controllers\TemplateLibraryController::class, 'toggleFeatured'])->name('toggle-featured');
+                    Route::post('/{id}/toggle-active', [App\Http\Controllers\TemplateLibraryController::class, 'toggleActive'])->name('toggle-active');
+                });
             });
 
         // Student Routes
@@ -114,6 +127,13 @@ Route::prefix('typing')->name('typing.')->group(function () {
                 Route::post('/matches/{id}/progress', [App\Http\Controllers\TypingMatchController::class, 'updateProgress'])->name('matches.progress');
                 Route::post('/matches/{id}/finish', [App\Http\Controllers\TypingMatchController::class, 'finish'])->name('matches.finish');
                 Route::post('/matches/cancel', [App\Http\Controllers\TypingMatchController::class, 'cancel'])->name('matches.cancel');
+
+                // Template Library Routes (Student)
+                Route::prefix('templates')->name('templates.')->group(function () {
+                    Route::get('/', [App\Http\Controllers\TemplateLibraryController::class, 'studentIndex'])->name('index');
+                    Route::get('/{id}', [App\Http\Controllers\TemplateLibraryController::class, 'show'])->name('show');
+                    Route::get('/{id}/download', [App\Http\Controllers\TemplateLibraryController::class, 'download'])->name('download');
+                });
             });
 
         // Shared Routes

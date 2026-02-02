@@ -51,6 +51,14 @@
                 <span>การแข่งขัน (Tournament)</span>
             </a>
 
+            <p class="px-4 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">แหล่งเรียนรู้</p>
+
+            <a href="{{ url('/typing/admin/templates') }}"
+                class="sidebar-link {{ request()->is('typing/admin/templates*') ? 'active' : '' }}">
+                <i class="fas fa-folder-open w-5 text-center"></i>
+                <span>คลังเอกสารตัวอย่าง</span>
+            </a>
+
             <p class="px-4 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">รายงาน</p>
 
             <a href="{{ url('/typing/admin/grades') }}"
@@ -97,6 +105,14 @@
                 class="sidebar-link {{ request()->is('typing/tournaments*') ? 'active' : '' }}">
                 <i class="fas fa-sitemap w-5 text-center"></i>
                 <span>การแข่งขัน (Tournament)</span>
+            </a>
+
+            <p class="px-4 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">แหล่งเรียนรู้</p>
+
+            <a href="{{ url('/typing/student/templates') }}"
+                class="sidebar-link {{ request()->is('typing/student/templates*') ? 'active' : '' }}">
+                <i class="fas fa-folder-open w-5 text-center"></i>
+                <span>คลังเอกสารตัวอย่าง</span>
             </a>
 
             <p class="px-4 py-2 mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">ผลการเรียน</p>
