@@ -183,7 +183,8 @@
                                         <div class="flex flex-col">
                                             <div class="flex items-center gap-1">
                                                 <span class="text-lg font-bold text-primary-600">{{ $submission->score }}</span>
-                                                <span class="text-gray-500">/{{ $submission->assignment->max_score ?? 100 }}</span>
+                                                <span
+                                                    class="text-gray-500">/{{ $submission->assignment->max_score ?? 100 }}</span>
                                             </div>
                                             @if($submission->feedback && str_contains($submission->feedback, 'โหมดเข้มงวด'))
                                                 <span class="text-xs text-amber-600 flex items-center gap-1">
@@ -203,7 +204,7 @@
                                                 <button
                                                     @click="quickGrade({{ $submission->id }}, {{ $quickScore }}, $el, {{ $submission->assignment->max_score ?? 100 }})"
                                                     class="w-8 h-8 rounded-full text-xs font-bold transition-all duration-200 
-                                                    {{ $submission->score == $quickScore ? 'bg-primary-600 text-white ring-2 ring-primary-300' : 'bg-gray-100 hover:bg-primary-100 text-gray-700 hover:text-primary-600' }}"
+                                                            {{ $submission->score == $quickScore ? 'bg-primary-600 text-white ring-2 ring-primary-300' : 'bg-gray-100 hover:bg-primary-100 text-gray-700 hover:text-primary-600' }}"
                                                     :class="{ 'opacity-50 cursor-not-allowed': loading }" :disabled="loading"
                                                     title="ให้ {{ $quickScore }} คะแนน">
                                                     {{ $quickScore }}
@@ -216,6 +217,13 @@
                                             @click="openGradingModal({{ $submission->id }}, {{ $submission->score ?? 'null' }}, $el.dataset.feedback, {{ $submission->assignment->max_score ?? 100 }})"
                                             class="btn-outline py-1.5 px-2 text-sm" title="ให้คะแนนแบบละเอียด + ข้อเสนอแนะ">
                                             <i class="fas fa-edit"></i>
+                                        </button>
+
+                                        {{-- Delete Button --}}
+                                        <button @click="deleteSubmission({{ $submission->id }})"
+                                            class="btn-outline text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200 py-1.5 px-2 text-sm"
+                                            title="ลบงานที่ส่ง">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -233,7 +241,8 @@
             <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-100">
                 <p class="text-sm text-gray-500">แสดง
                     {{ $submissions->firstItem() ?? 0 }}-{{ $submissions->lastItem() ?? 0 }} จาก
-                    {{ $submissions->total() }} รายการ</p>
+                    {{ $submissions->total() }} รายการ
+                </p>
                 {{ $submissions->links() }}
             </div>
         </div>
@@ -595,17 +604,48 @@
                         }
                     },
 
-                    showToast(message, type = 'success') {
-                        const toast = document.createElement('div');
-                        toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white z-50 transform transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
-                        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
-                        document.body.appendChild(toast);
 
-                        setTimeout(() => {
-                            toast.classList.add('opacity-0', 'translate-y-2');
-                            setTimeout(() => toast.remove(), 300);
-                        }, 2000);
+
+                async deleteSubmission(id) {
+                    if(!confirm('คุณแน่ใจหรือไม่ที่จะลบงานที่ส่งนี้? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`{{ url('typing/admin/submissions') }}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
                     }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.showToast(data.message || 'ลบงานเรียบร้อยแล้ว', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showToast(data.error || 'เกิดข้อผิดพลาดในการลบงาน', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                this.showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            }
+                    },
+
+            showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white z-50 transform transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+                toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>${message}`;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 2000);
+            }
                 }));
             });
         </script>

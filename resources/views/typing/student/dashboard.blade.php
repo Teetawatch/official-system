@@ -1,29 +1,20 @@
 <x-typing-app :role="'student'" :title="'แดชบอร์ดนักเรียน - ระบบวิชาพิมพ์หนังสือราชการ 1'">
 
-    <!-- Welcome Banner -->
-    <div
-        class="relative overflow-hidden bg-white border border-gray-100 rounded-3xl p-8 mb-8 text-gray-800 shadow-xl group hover:shadow-2xl transition-all duration-500">
-        <!-- Modern Mesh Gradients (Warm & Visible at Top Right) -->
-        <div
-            class="absolute top-[-20%] right-[-5%] w-[500px] h-[500px] bg-gradient-to-br from-orange-200/50 via-amber-200/50 to-yellow-100/50 rounded-full blur-3xl animate-pulse-slow pointer-events-none">
-        </div>
-        <div
-            class="absolute top-[10%] right-[15%] w-[400px] h-[400px] bg-gradient-to-tr from-rose-200/40 via-pink-200/40 to-red-100/40 rounded-full blur-3xl animate-pulse-slow delay-1000 pointer-events-none">
-        </div>
+    <!-- Welcome Banner with Aurora Effect -->
+    <div class="relative overflow-hidden bg-white border border-white/40 rounded-[2.5rem] p-8 mb-10 shadow-2xl group transition-all duration-500 hover:shadow-primary-500/20">
+        <!-- Aurora Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/50 to-blue-50/30 opacity-80"></div>
+        
+        <!-- Modern Mesh Gradients (Aurora) -->
+        <div class="absolute top-[-30%] right-[-10%] w-[600px] h-[600px] bg-gradient-to-br from-orange-300/30 via-pink-300/30 to-rose-200/30 rounded-full blur-[80px] animate-pulse-slow pointer-events-none mix-blend-multiply"></div>
+        <div class="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] bg-gradient-to-tr from-blue-200/30 via-indigo-200/30 to-purple-200/30 rounded-full blur-[80px] animate-pulse-slow delay-1000 pointer-events-none mix-blend-multiply"></div>
+        <div class="absolute top-[20%] left-[20%] w-[300px] h-[300px] bg-gradient-to-r from-teal-200/20 to-emerald-200/20 rounded-full blur-[60px] animate-pulse-slow delay-700 pointer-events-none"></div>
 
-        <!-- Geometric Patterns -->
-        <svg class="absolute top-6 right-6 w-40 h-40 text-orange-200/60 rotate-12" viewBox="0 0 100 100"
-            fill="currentColor">
+        <!-- Geometric Accents -->
+        <svg class="absolute top-10 right-10 w-32 h-32 text-orange-400/20 rotate-12 animate-float" viewBox="0 0 100 100" fill="currentColor">
             <rect x="10" y="10" width="20" height="20" rx="4" />
-            <rect x="60" y="10" width="30" height="30" rx="6" />
-            <rect x="10" y="50" width="40" height="40" rx="8" />
-            <circle cx="80" cy="80" r="10" />
-        </svg>
-        <svg class="absolute bottom-0 right-1/4 w-64 h-64 text-rose-50/80 -translate-x-1/2 translate-y-1/4 z-0"
-            viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path fill="currentColor"
-                d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,79.6,-46.9C87.4,-34.7,90.1,-20.4,90.9,-6.2C91.7,8,90.6,22.1,84.3,34.9C78,47.7,66.5,59.3,53.2,67.6C39.9,76,24.8,81.2,9.3,82.4C-6.2,83.6,-22.1,80.8,-36.5,73.7C-50.9,66.6,-63.8,55.2,-73.2,41.9C-82.6,28.6,-88.4,13.4,-88.1,-1.6C-87.8,-16.6,-81.4,-31.4,-70.9,-43.3C-60.4,-55.2,-45.8,-64.2,-31.2,-71.1C-16.6,-78,-2,-82.8,11.5,-81.2C25,-79.6,30.5,-83.6,44.7,-76.4Z"
-                transform="translate(100 100)" />
+            <rect x="60" y="20" width="30" height="30" rx="8" />
+            <circle cx="80" cy="80" r="8" />
         </svg>
 
         @php
@@ -31,80 +22,76 @@
             $titleItem = $user->equipped_title_item;
             $frameGradient = $frameItem && isset($frameItem->data['gradient'])
                 ? $frameItem->data['gradient']
-                : 'from-blue-400 to-purple-500';
+                : 'from-blue-400 to-indigo-500';
         @endphp
 
-        <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
-            <!-- Avatar Section with Frame -->
-            <div class="relative group cursor-pointer flex flex-col items-center">
-                <div
-                    class="absolute -inset-1 bg-gradient-to-r {{ $frameGradient }} rounded-full blur opacity-30 group-hover:opacity-50 transition duration-500">
-                </div>
-                <div class="relative">
-                    <div
-                        class="w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br {{ $frameGradient }} p-1 shadow-xl">
-                        <img src="{{ $user->avatar_url }}" alt="Avatar"
-                            class="w-full h-full rounded-full object-cover border-4 border-white transition-transform duration-500 group-hover:scale-105">
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <!-- Avatar Section -->
+            <div class="relative group cursor-pointer perspective-1000">
+                <div class="absolute -inset-2 bg-gradient-to-r {{ $frameGradient }} rounded-full blur-lg opacity-40 group-hover:opacity-70 transition duration-500 will-change-transform"></div>
+                <div class="relative transform group-hover:scale-105 transition-transform duration-500">
+                    <div class="w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br {{ $frameGradient }} p-[3px] shadow-2xl ring-4 ring-white/50 backdrop-blur-sm">
+                        <img src="{{ $user->avatar_url }}" alt="Avatar" class="w-full h-full rounded-full object-cover border-[3px] border-white bg-white shadow-inner">
                     </div>
+                    
                     @if($frameItem && isset($frameItem->data['icon']))
-                        <div
-                            class="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100">
-                            <span class="text-lg">{{ $frameItem->data['icon'] }}</span>
+                        <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-100 transform group-hover:rotate-12 transition-transform duration-300">
+                            <span class="text-xl">{{ $frameItem->data['icon'] }}</span>
                         </div>
                     @endif
-                    <div class="absolute bottom-0 left-0 bg-white p-1 rounded-full shadow-md">
-                        <div
-                            class="w-5 h-5 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full border-2 border-white animate-pulse">
-                        </div>
+                    
+                    <div class="absolute bottom-1 left-1 bg-white p-1.5 rounded-full shadow-md">
+                        <div class="w-4 h-4 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full border-2 border-white animate-pulse"></div>
                     </div>
                 </div>
 
-                {{-- Title Badge under Avatar --}}
+                {{-- Title Badge --}}
                 @if($titleItem)
-                    <div
-                        class="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r {{ $titleItem->rarity_color }} text-white text-xs font-bold shadow-lg">
-                        @if(isset($titleItem->data['emoji']))<span>{{ $titleItem->data['emoji'] }}</span>@endif
-                        <span>{{ $titleItem->name }}</span>
+                    <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max max-w-[150px]">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r {{ $titleItem->rarity_color }} text-white text-xs font-bold shadow-lg ring-2 ring-white transform group-hover:-translate-y-1 transition-transform duration-300">
+                            @if(isset($titleItem->data['emoji']))<span>{{ $titleItem->data['emoji'] }}</span>@endif
+                            <span class="truncate">{{ $titleItem->name }}</span>
+                        </div>
                     </div>
                 @endif
             </div>
 
-            <!-- Text Content -->
+            <!-- Content Section -->
             <div class="flex-1 text-center md:text-left">
-                @php
-                    $nameColorItem = $user->equipped_name_color_item;
-                    $nameColorClass = $nameColorItem ? ($nameColorItem->data['class'] ?? '') : 'text-blue-600';
-                @endphp
-                <h1
-                    class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3 text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800 drop-shadow-sm">
-                    สวัสดีคุณ <span
-                        class="{{ $nameColorClass }} decoration-blue-200 decoration-2 underline-offset-4">{{ $user->name }}</span>
-                </h1>
+                <div class="space-y-2 mb-6">
+                    @php
+                        $nameColorItem = $user->equipped_name_color_item;
+                        $nameColorClass = $nameColorItem ? ($nameColorItem->data['class'] ?? '') : 'text-gray-800';
+                    @endphp
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-2 drop-shadow-sm">
+                        <span class="text-gray-400 text-2xl md:text-3xl font-medium block md:inline mb-1 md:mb-0">สวัสดี,</span>
+                        <span class="{{ $nameColorClass }} bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-800">{{ $user->name }}</span>
+                    </h1>
+                    
+                    <p class="text-gray-500 text-lg md:text-xl font-medium leading-relaxed max-w-2xl mx-auto md:mx-0">
+                        "ความพยายามในวันนี้ คือความสำเร็จในวันข้างหน้า"
+                    </p>
+                    <p class="text-sm text-indigo-500/80 font-medium tracking-wide shimmer-text">
+                        ✨ มาฝึกพิมพ์วันละนิด เพื่ออนาคตที่สดใสกันเถอะ!
+                    </p>
+                </div>
 
-                <p class="text-gray-500 text-lg mb-6 max-w-2xl font-medium leading-relaxed">
-                    "ความพยายามในวันนี้ คือความสำเร็จในวันข้างหน้า" <br>
-                    <span class="text-sm text-gray-400 font-normal">มาฝึกพิมพ์วันละนิด เพื่ออนาคตที่สดใสกันเถอะ!
-                        ✨</span>
-                </p>
-
-                <!-- Stats Badges -->
-                <div class="flex flex-wrap justify-center md:justify-start gap-3">
-                    <div
-                        class="group/badge flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-base group-hover/badge:scale-110 transition-transform">
+                <!-- Bento-style Stats Badges -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <!-- Student ID -->
+                    <div class="group/badge flex items-center gap-3 pr-5 pl-2 py-2 rounded-full bg-white/60 border border-white/60 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 backdrop-blur-md">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner group-hover/badge:scale-110 transition-transform">
                             <i class="fas fa-id-card-clip"></i>
                         </div>
                         <div class="text-left">
                             <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">รหัสนักเรียน</p>
-                            <p class="text-sm font-bold text-gray-800">{{ $user->student_id ?? '-' }}</p>
+                            <p class="text-sm font-bold text-gray-800 font-mono">{{ $user->student_id ?? '-' }}</p>
                         </div>
                     </div>
 
-                    <div
-                        class="group/badge flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-100 hover:bg-purple-50/30 transition-all duration-300">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-base group-hover/badge:scale-110 transition-transform">
+                    <!-- Class -->
+                    <div class="group/badge flex items-center gap-3 pr-5 pl-2 py-2 rounded-full bg-white/60 border border-white/60 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 backdrop-blur-md">
+                        <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shadow-inner group-hover/badge:scale-110 transition-transform">
                             <i class="fas fa-graduation-cap"></i>
                         </div>
                         <div class="text-left">
@@ -113,320 +100,360 @@
                         </div>
                     </div>
 
-                    {{-- Points Badge --}}
-                    <a href="{{ route('typing.shop.index') }}"
-                        class="group/badge flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 shadow-sm hover:shadow-md hover:border-amber-300 transition-all duration-300">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center text-base group-hover/badge:scale-110 transition-transform shadow">
-                            <i class="fas fa-coins"></i>
+                    <!-- Points (Premium Action) -->
+                    <a href="{{ route('typing.shop.index') }}" class="group/badge relative flex items-center gap-3 pr-5 pl-2 py-2 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 shadow-sm hover:shadow-amber-200/50 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 translate-x-[-100%] group-hover/badge:translate-x-[100%] transition-transform duration-1000"></div>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center shadow-lg group-hover/badge:scale-110 group-hover/badge:rotate-12 transition-transform">
+                            <i class="fas fa-coins text-sm"></i>
                         </div>
-                        <div class="text-left">
+                        <div class="text-left z-10">
                             <p class="text-[10px] text-amber-600 uppercase tracking-wider font-bold">คะแนนสะสม</p>
-                            <p class="text-sm font-bold text-amber-700">{{ number_format($user->points ?? 0) }} <i
-                                    class="fas fa-arrow-right text-[8px] ml-1 opacity-50"></i></p>
+                            <p class="text-sm font-black text-amber-700 font-mono">{{ number_format($user->points ?? 0) }}</p>
                         </div>
+                        <i class="fas fa-chevron-right text-[10px] text-amber-400 ml-1 opacity-0 -translate-x-2 group-hover/badge:opacity-100 group-hover/badge:translate-x-0 transition-all"></i>
                     </a>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-6 md:mt-0 flex flex-col gap-3">
-                <div class="relative group">
-                    <div
-                        class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-300">
+            <!-- Action Area -->
+            <div class="mt-8 md:mt-0 flex flex-col gap-4 w-full md:w-auto min-w-[200px]">
+                <a href="{{ route('typing.profile') }}" class="relative group w-full overflow-hidden rounded-2xl p-[1px]">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 group-hover:from-blue-400 group-hover:to-indigo-500 transition-colors duration-500"></div>
+                    <div class="relative flex items-center gap-3 px-5 py-3.5 bg-white rounded-2xl group-hover:bg-white/95 transition-colors">
+                        <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">โปรไฟล์</p>
+                            <p class="text-sm font-bold text-gray-800">แก้ไขข้อมูล</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
                     </div>
-                    <a href="{{ route('typing.profile') }}"
-                        class="relative flex items-center gap-3 px-5 py-3 bg-white text-gray-800 rounded-xl font-bold border border-gray-100 shadow-lg hover:-translate-y-1 transition-all duration-300">
-                        <div class="w-8 h-8 rounded-lg bg-gray-900 text-white flex items-center justify-center">
-                            <i class="fas fa-pen-nib text-sm"></i>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-xs text-gray-500 font-medium">ต้องการแก้ไข?</span>
-                            <span class="text-sm">แก้ไขข้อมูลส่วนตัว</span>
-                        </div>
-                        <i
-                            class="fas fa-chevron-right text-gray-300 ml-2 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
+                </a>
 
-                <a href="{{ route('typing.shop.my-rewards') }}"
-                    class="flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:-translate-y-1 transition-all duration-300 hover:shadow-purple-500/30">
-                    <i class="fas fa-box-open"></i>
-                    <span class="text-sm">รางวัลของฉัน</span>
+                <a href="{{ route('typing.shop.my-rewards') }}" class="group relative w-full flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+                    <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-white/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+                    
+                    <div class="relative w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/10 group-hover:rotate-12 transition-transform">
+                        <i class="fas fa-gift text-lg"></i>
+                    </div>
+                    <div class="relative flex-1">
+                        <p class="text-xs text-indigo-100 font-medium opacity-90">ของสะสม</p>
+                        <p class="text-base font-bold">รางวัลของฉัน</p>
+                    </div>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-        <!-- My Score -->
-        <div class="card group hover:shadow-lg">
-            <div class="flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm text-gray-500">คะแนนรวม</span>
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-star text-white"></i>
+    <!-- Bento Grid Stats - Premium Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-10">
+        <!-- Card 1: Total Score -->
+        <div class="group relative bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-blue-100 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative flex flex-col h-full justify-between">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-star text-xl"></i>
                     </div>
-                </div>
-                <p class="text-2xl md:text-3xl font-bold text-gray-800">{{ number_format($totalScore, 0) }}</p>
-                <p class="text-xs text-gray-500 mt-1">สะสมจากงานที่ตรวจแล้ว</p>
-                <div class="mt-2 progress">
                     @php $scorePercent = $submissions->count() > 0 ? min(100, ($avgScore ?? 0)) : 0; @endphp
-                    <div class="progress-bar bg-gradient-to-r from-primary-500 to-primary-400"
-                        style="width: {{ $scorePercent }}%"></div>
+                    <div class="flex items-center gap-1 text-xs font-bold text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                        <span>รวม</span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-3xl font-black text-gray-800 tracking-tight group-hover:text-blue-600 transition-colors">{{ number_format($totalScore, 0) }}</h3>
+                    <p class="text-sm text-gray-500 font-medium mt-1">คะแนนรวมทั้งหมด</p>
+                </div>
+                <div class="mt-4 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-1000" style="width: {{ $scorePercent }}%"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Ranking -->
-        <div class="card group hover:shadow-lg">
-            <div class="flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm text-gray-500">อันดับ</span>
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-trophy text-white"></i>
+        <!-- Card 2: Rank -->
+        <div class="group relative bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-amber-100 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-50 to-transparent rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative flex flex-col h-full justify-between">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-amber-50 rounded-2xl text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">
+                        @if($userRank <= 3) Top 3! @else Top 10 @endif
                     </div>
                 </div>
-                <div class="flex items-baseline gap-1">
-                    <p class="text-2xl md:text-3xl font-bold text-gray-800">#{{ $userRank }}</p>
-                    <span class="text-sm text-gray-500">/ {{ $totalStudents }} คน</span>
+                <div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 class="text-3xl font-black text-gray-800 tracking-tight group-hover:text-amber-600 transition-colors">#{{ $userRank }}</h3>
+                        <span class="text-sm font-bold text-gray-400">/ {{ $totalStudents }}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium mt-1">อันดับปัจจุบัน</p>
                 </div>
-                <p class="text-xs text-secondary-600 mt-1">
-                    @if($userRank <= 3)
-                        <i class="fas fa-medal mr-1"></i> Top 3!
-                    @else
-                        <i class="fas fa-chart-line mr-1"></i> สู้ต่อไป!
-                    @endif
-                </p>
+                <div class="mt-4 pt-4 border-t border-dashed border-gray-100">
+                    <p class="text-xs text-gray-400">
+                        <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+                        แข่งกับเพื่อนในห้อง
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Completed Tasks -->
-        <div class="card group hover:shadow-lg">
-            <div class="flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm text-gray-500">ส่งงานแล้ว</span>
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary-500 to-secondary-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-check-circle text-white"></i>
+        <!-- Card 3: Tasks -->
+        <div class="group relative bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-emerald-100 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-50 to-transparent rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative flex flex-col h-full justify-between">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-emerald-50 rounded-2xl text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    @php $remaining = max(0, $totalAssignments - $submittedCount); @endphp
+                    <div class="flex items-center gap-1 text-xs font-bold {{ $remaining == 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-gray-400 bg-gray-50 border-gray-100' }} px-2.5 py-1 rounded-full border">
+                        <span>{{ $remaining == 0 ? 'ครบแล้ว' : 'เหลือ ' . $remaining }}</span>
                     </div>
                 </div>
-                <div class="flex items-baseline gap-1">
-                    <p class="text-2xl md:text-3xl font-bold text-gray-800">{{ $submittedCount }}</p>
-                    <span class="text-sm text-gray-500">/ {{ $totalAssignments }} งาน</span>
+                <div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 class="text-3xl font-black text-gray-800 tracking-tight group-hover:text-emerald-600 transition-colors">{{ $submittedCount }}</h3>
+                        <span class="text-sm font-bold text-gray-400">/ {{ $totalAssignments }}</span>
+                    </div>
+                    <p class="text-sm text-gray-500 font-medium mt-1">งานที่ส่งแล้ว</p>
                 </div>
-                @php $remaining = max(0, $totalAssignments - $submittedCount); @endphp
-                <p class="text-xs {{ $remaining > 0 ? 'text-amber-600' : 'text-secondary-600' }} mt-1">
-                    @if($remaining > 0)
-                        <i class="fas fa-clock mr-1"></i> เหลืออีก {{ $remaining }} งาน
-                    @else
-                        <i class="fas fa-check mr-1"></i> ส่งครบแล้ว!
-                    @endif
-                </p>
+                <!-- Circular Progress Mini -->
+                <div class="mt-4 pt-4 border-t border-dashed border-gray-100 flex items-center justify-between">
+                    <p class="text-xs text-gray-400">ความคืบหน้า</p>
+                    <span class="text-xs font-bold text-gray-700">{{ $totalAssignments > 0 ? round(($submittedCount / $totalAssignments) * 100) : 0 }}%</span>
+                </div>
             </div>
         </div>
 
-        <!-- Average Score -->
-        <div class="card group hover:shadow-lg">
-            <div class="flex flex-col">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm text-gray-500">คะแนนเฉลี่ย</span>
-                    <div
-                        class="w-10 h-10 rounded-lg bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-chart-line text-white"></i>
+        <!-- Card 4: Avg Score -->
+        <div class="group relative bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 hover:border-rose-100 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-rose-50 to-transparent rounded-bl-full -mr-10 -mt-10 opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+            <div class="relative flex flex-col h-full justify-between">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-rose-50 rounded-2xl text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-100">
+                        <i class="fas fa-fire"></i> Performance
                     </div>
                 </div>
-                <p class="text-2xl md:text-3xl font-bold text-gray-800">{{ number_format($avgScore, 1) }}%</p>
-                <p
-                    class="text-xs {{ $avgScore >= 80 ? 'text-secondary-600' : ($avgScore >= 60 ? 'text-primary-600' : 'text-amber-600') }} mt-1">
-                    @if($avgScore >= 80)
-                        <i class="fas fa-fire mr-1"></i> ยอดเยี่ยม!
-                    @elseif($avgScore >= 60)
-                        <i class="fas fa-thumbs-up mr-1"></i> ดีมาก!
-                    @else
-                        <i class="fas fa-chart-line mr-1"></i> พัฒนาต่อไป!
-                    @endif
-                </p>
+                <div>
+                    <h3 class="text-3xl font-black text-gray-800 tracking-tight group-hover:text-rose-600 transition-colors">{{ number_format($avgScore, 1) }}%</h3>
+                    <p class="text-sm text-gray-500 font-medium mt-1">คะแนนเฉลี่ย</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-dashed border-gray-100">
+                    <p class="text-xs {{ $avgScore >= 80 ? 'text-emerald-500 font-bold' : ($avgScore >= 60 ? 'text-amber-500' : 'text-rose-500') }}">
+                         @if($avgScore >= 80) ยอดเยี่ยม! 🌟 @elseif($avgScore >= 60) ทำได้ดี! 👍 @else ต้องพยายามเพิ่มนะ 💪 @endif
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Main Content Split -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
 
-        <!-- Pending Assignments (2 cols) -->
-        <div class="lg:col-span-2 card">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-clipboard-list text-primary-500 mr-2"></i>
-                    งานที่ต้องทำ
-                </h2>
-                <a href="{{ route('typing.student.assignments') }}"
-                    class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                    ดูทั้งหมด <i class="fas fa-arrow-right ml-1"></i>
+        <!-- Column 1 & 2: Pending Tasks -->
+        <div class="xl:col-span-2 space-y-8">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-2">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">งานที่ต้องทำ</h2>
+                </div>
+                <a href="{{ route('typing.student.assignments') }}" class="group flex items-center gap-2 text-sm font-bold text-indigo-500 hover:text-indigo-600 transition-colors">
+                    ดูทั้งหมด
+                    <span class="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </span>
                 </a>
             </div>
 
-            <div class="space-y-4">
+            <!-- Tasks Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @forelse($pendingAssignments as $assignment)
                     @php
                         $isUrgent = $assignment->due_date && $assignment->due_date->isFuture() && $assignment->due_date->diffInDays(now()) <= 2;
                     @endphp
-                    <div
-                        class="flex gap-4 p-4 rounded-xl {{ $isUrgent ? 'border-l-4 border-red-500 bg-red-50 hover:bg-red-100' : 'border border-gray-200 hover:border-primary-300 hover:shadow-md' }} transition-all">
-                        <div
-                            class="w-12 h-12 rounded-xl {{ $isUrgent ? 'bg-red-500' : 'bg-amber-500' }} flex items-center justify-center flex-shrink-0">
-                            <i class="fas {{ $isUrgent ? 'fa-fire' : 'fa-file-alt' }} text-white text-lg"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <h3 class="font-semibold text-gray-800">{{ $assignment->title }}</h3>
-                                    <p class="text-sm text-gray-500 mt-1">คะแนนเต็ม {{ $assignment->max_score }} คะแนน</p>
+                    <div class="group relative bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:border-indigo-100 transition-all duration-300">
+                        @if($isUrgent)
+                            <div class="absolute -top-3 -right-3">
+                                <span class="relative flex h-6 w-6">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-6 w-6 bg-red-500 text-white text-[10px] items-center justify-center shadow-md">
+                                      <i class="fas fa-exclamation"></i>
+                                  </span>
+                                </span>
+                            </div>
+                        @endif
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-12 h-12 rounded-xl {{ $isUrgent ? 'bg-red-50 text-red-500' : 'bg-indigo-50 text-indigo-500' }} flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+                                    <i class="fas {{ $isUrgent ? 'fa-fire' : 'fa-file-alt' }}"></i>
                                 </div>
-                                @if($isUrgent)
-                                    <span class="badge-danger flex-shrink-0">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        ด่วน!
-                                    </span>
-                                @else
-                                    <span class="badge-warning flex-shrink-0">เปิดรับงาน</span>
-                                @endif
                             </div>
-                            <div class="flex items-center gap-4 mt-3">
-                                @if($assignment->due_date)
-                                    <span class="text-xs {{ $isUrgent ? 'text-red-600 font-bold' : 'text-gray-500' }}">
-                                        @if($assignment->due_date && $assignment->due_date->isFuture())
-                                            @if($isUrgent)
-                                                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-100 rounded-lg shadow-sm"
-                                                    x-data="{ 
-                                                                        timeLeft: '', 
-                                                                        target: {{ $assignment->due_date->timestamp * 1000 }},
-                                                                        update() {
-                                                                            const now = new Date().getTime();
-                                                                            const diff = this.target - now;
-
-                                                                            if (diff <= 0) {
-                                                                                this.timeLeft = 'หมดเวลา';
-                                                                                return;
-                                                                            }
-
-                                                                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                                                                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                                                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                                                                            let text = '';
-                                                                            if(days > 0) text += days + 'วัน ';
-                                                                            text += hours.toString().padStart(2, '0') + ':' + 
-                                                                                    minutes.toString().padStart(2, '0') + ':' + 
-                                                                                    seconds.toString().padStart(2, '0');
-                                                                            this.timeLeft = text;
-                                                                        }
-                                                                     }" x-init="update(); setInterval(() => update(), 1000)">
-                                                    <i class="fas fa-stopwatch text-lg animate-pulse"></i>
-                                                    <span class="font-mono text-lg font-bold tracking-wide text-red-600"
-                                                        x-text="timeLeft">กำลังโหลด...</span>
-                                                </div>
-                                            @else
-                                                <i class="fas fa-calendar mr-1"></i>
-                                                กำหนดส่ง {{ $assignment->due_date->format('d/m/Y H:i') }}
-                                            @endif
+                            
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-800 line-clamp-1 group-hover:text-indigo-600 transition-colors">{{ $assignment->title }}</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-500">
+                                        {{ $assignment->max_score }} คะแนน
+                                    </span>
+                                    @if($isUrgent)
+                                        <span class="text-xs font-bold text-red-500">ด่วน!</span>
+                                    @endif
+                                </div>
+                                
+                                <div class="mt-4 flex items-center justify-between">
+                                    <div class="text-xs text-gray-400 font-medium">
+                                        @if($assignment->due_date)
+                                            <i class="far fa-clock mr-1"></i> {{ $assignment->due_date->format('d/m H:i') }}
                                         @else
-                                            <span class="text-gray-400">ไม่มีกำหนดส่ง</span>
+                                            <span>ไม่กำหนด</span>
                                         @endif
-                                    </span>
-                                @endif
-                                @if($assignment->submission_type === 'file')
-                                    <a href="{{ route('typing.student.upload', $assignment->id) }}"
-                                        class="btn-primary text-xs py-1.5">
-                                        <i class="fas fa-file-upload mr-1"></i>
-                                        อัปโหลดไฟล์
-                                    </a>
-                                @else
-                                    <a href="{{ route('typing.student.practice', $assignment->id) }}"
-                                        class="btn-primary text-l py-1.5">
-                                        <i class="fas fa-keyboard mr-1"></i>
-                                        เริ่มพิมพ์
-                                    </a>
-                                @endif
+                                    </div>
+                                    
+                                    @if($assignment->submission_type === 'file')
+                                        <a href="{{ route('typing.student.upload', $assignment->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200">
+                                            <i class="fas fa-upload"></i> ส่งไฟล์
+                                        </a>
+                                    @else
+                                        <a href="{{ route('typing.student.practice', $assignment->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                                            <i class="fas fa-play"></i> เริ่มงาน
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-check-circle text-4xl text-secondary-400 mb-2"></i>
-                        <p>ส่งงานครบทุกชิ้นแล้ว!</p>
+                    <div class="col-span-full flex flex-col items-center justify-center py-12 bg-white/50 border border-dashed border-gray-200 rounded-3xl">
+                        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-check text-2xl text-green-500"></i>
+                        </div>
+                        <p class="text-gray-500 font-medium">เย้! ส่งงานครบทุกชิ้นแล้ว</p>
                     </div>
                 @endforelse
             </div>
+
+            <!-- Progress Chart Section -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+                            <i class="fas fa-chart-area"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">พัฒนาการการพิมพ์</h2>
+                    </div>
+                    <select class="text-xs font-bold text-gray-500 bg-gray-50 border-none rounded-lg focus:ring-0 cursor-pointer hover:bg-gray-100">
+                        <option>10 ครั้งล่าสุด</option>
+                    </select>
+                </div>
+                <div class="relative h-72 w-full">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- My Scores -->
-        <div class="card">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    <i class="fas fa-star text-amber-500 mr-2"></i>
-                    คะแนนล่าสุด
-                </h2>
-                <a href="{{ route('typing.student.grades') }}"
-                    class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                    ดูทั้งหมด
-                </a>
+        <!-- Column 3: Recent & Leaderboard -->
+        <div class="space-y-8">
+            
+            <!-- Recent Scores Widget -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-history text-gray-400"></i> คะแนนล่าสุด
+                    </h2>
+                    <a href="{{ route('typing.student.grades') }}" class="text-xs font-bold text-gray-400 hover:text-gray-600">ดูทั้งหมด</a>
+                </div>
+                
+                <div class="relative pl-4 space-y-6 before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-gray-100">
+                    @forelse($submissions->take(5) as $submission)
+                        <div class="relative group">
+                            <div class="absolute -left-[21px] mt-1.5 h-3 w-3 rounded-full border-2 border-white {{ $submission->score >= ($submission->assignment->max_score * 0.8) ? 'bg-green-500 shadow-green-200' : 'bg-gray-300' }} shadow-sm z-10"></div>
+                            <div class="flex items-start justify-between group-hover:translate-x-1 transition-transform duration-300">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 line-clamp-1" title="{{ $submission->assignment->title }}">{{ $submission->assignment->title }}</h4>
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $submission->created_at->diffForHumans() }}</p>
+                                </div>
+                                <span class="text-sm font-black {{ $submission->score >= ($submission->assignment->max_score * 0.8) ? 'text-green-500' : 'text-gray-600' }}">
+                                    {{ $submission->score }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 italic">ยังไม่มีการส่งงาน</p>
+                    @endforelse
+                </div>
             </div>
 
-            <div class="space-y-4">
-                @php
-                    $colors = ['secondary', 'primary', 'accent', 'amber'];
-                @endphp
-                @forelse($submissions->take(4) as $index => $submission)
-                    @php
-                        $color = $colors[$index % count($colors)];
-                        $percent = $submission->assignment ? min(100, ($submission->score / $submission->assignment->max_score) * 100) : 0;
-                    @endphp
-                    <div class="p-3 rounded-xl bg-{{ $color }}-50">
-                        <div class="flex items-center justify-between mb-2">
-                            <span
-                                class="font-medium text-gray-800">{{ Str::limit($submission->assignment->title ?? 'N/A', 20) }}</span>
-                            <span
-                                class="text-lg font-bold text-{{ $color }}-600">{{ $submission->score }}/{{ $submission->assignment->max_score ?? 100 }}</span>
+            <!-- Mini Leaderboard -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 shadow-xl text-white relative overflow-hidden">
+                <!-- Background Decoration -->
+                <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                
+                <div class="flex items-center justify-between mb-6 relative z-10">
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fas fa-crown text-amber-400"></i> Top 5 ผู้นำ
+                    </h2>
+                    <a href="{{ route('typing.leaderboard') }}" class="text-xs font-bold text-gray-400 hover:text-white transition-colors">ดูทั้งหมด</a>
+                </div>
+
+                <div class="space-y-4 relative z-10">
+                    @forelse($leaderboard->take(5) as $index => $leader)
+                        @php $rank = $index + 1; @endphp
+                        <div class="flex items-center gap-3 p-2 rounded-xl {{ $leader->id === $user->id ? 'bg-white/10 border border-white/20' : 'hover:bg-white/5' }} transition-colors">
+                            <div class="flex-shrink-0 w-6 text-center font-bold {{ $rank == 1 ? 'text-amber-400' : ($rank == 2 ? 'text-gray-300' : ($rank == 3 ? 'text-amber-600' : 'text-gray-500')) }}">
+                                {{ $rank }}
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-gray-700 p-0.5 overflow-hidden">
+                                <img src="{{ $leader->avatar_url }}" alt="" class="w-full h-full rounded-full object-cover">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold truncate text-gray-200">{{ $leader->name }}</p>
+                            </div>
+                            <div class="font-mono text-xs font-bold text-indigo-300">
+                                {{ number_format($leader->typing_submissions_sum_score) }}
+                            </div>
+                            @if($rank == 1) <i class="fas fa-crown text-amber-400 text-xs"></i> @endif
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-gradient-to-r from-{{ $color }}-500 to-{{ $color }}-400"
-                                style="width: {{ $percent }}%"></div>
-                        </div>
+                    @empty
+                        <p class="text-sm text-gray-500 text-center py-4">ยังไม่มีข้อมูล</p>
+                    @endforelse
+                </div>
+                
+                @if($userRank > 5)
+                    <div class="mt-4 pt-4 border-t border-white/10 text-center">
+                        <p class="text-xs text-gray-400">อันดับของคุณ: <span class="text-white font-bold">#{{ $userRank }}</span></p>
                     </div>
-                @empty
-                    <div class="text-center py-8 text-gray-500">
-                        <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
-                        <p>ยังไม่มีคะแนน</p>
-                    </div>
-                @endforelse
+                @endif
             </div>
+
         </div>
     </div>
 
-    <!-- Progress Chart -->
-    <div class="card mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-chart-area text-primary-500 mr-2"></i>
-                พัฒนาการการพิมพ์ (10 ครั้งล่าสุด)
-            </h2>
-        </div>
-        <div class="relative h-64 w-full">
-            <canvas id="progressChart"></canvas>
-        </div>
-    </div>
-
+    <!-- Chart Script -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const chartData = @json($chartData);
+            const chartData = @json($chartData); // Expecting { labels: [], accuracy: [], wpm: [] }
+
+            // Gradient for Line 1
+            let gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient1.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+            gradient1.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+            // Gradient for Line 2
+            let gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient2.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+            gradient2.addColorStop(1, 'rgba(59, 130, 246, 0)');
 
             new Chart(ctx, {
                 type: 'line',
@@ -436,19 +463,31 @@
                         {
                             label: 'ความแม่นยำ (%)',
                             data: chartData.accuracy,
-                            borderColor: '#10b981', // green-500
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
+                            borderColor: '#10b981', // Emerald 500
+                            backgroundColor: gradient1,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#10b981',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.4,
+                            fill: true,
                             yAxisID: 'y'
                         },
                         {
                             label: 'ความเร็ว (WPM)',
                             data: chartData.wpm,
-                            borderColor: '#3b82f6', // blue-500
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3,
+                            borderColor: '#6366f1', // Indigo 500
+                            backgroundColor: gradient2,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#6366f1',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.4,
+                            fill: true,
                             yAxisID: 'y1'
                         }
                     ]
@@ -456,32 +495,47 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        legend: {
-                            position: 'top',
+                        legend: { 
+                            position: 'top', 
+                            align: 'end',
+                            labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Kanit', sans-serif" } } 
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            titleFont: { family: "'Kanit', sans-serif", size: 13, weight: 'bold' },
+                            bodyFont: { family: "'Kanit', sans-serif", size: 12 },
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: true,
+                            boxPadding: 4
                         }
                     },
                     scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "'Kanit', sans-serif" }, color: '#9ca3af' }
+                        },
                         y: {
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: { display: true, text: 'ความแม่นยำ (%)' },
+                            title: { display: false },
                             min: 0,
-                            max: 100
+                            max: 100,
+                            grid: { borderDash: [4, 4], color: '#f3f4f6' },
+                            ticks: { font: { family: "'Kanit', sans-serif" }, color: '#9ca3af' }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            title: { display: true, text: 'WPM' },
-                            grid: {
-                                drawOnChartArea: false,
-                            },
+                            grid: { display: false },
+                            ticks: { font: { family: "'Kanit', sans-serif" }, color: '#9ca3af' }
                         },
                     }
                 }
@@ -489,142 +543,27 @@
         });
     </script>
 
-    <!-- Mini Leaderboard -->
-    <div class="mt-6 card">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-trophy text-amber-500 mr-2"></i>
-                Top 5 ผู้นำ
-            </h2>
-            <a href="{{ route('typing.leaderboard') }}"
-                class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                ดูทั้งหมด <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            @forelse($leaderboard as $index => $leader)
-                @php
-                    $rank = $index + 1;
-                    $isCurrentUser = $leader->id === $user->id;
-                    $score = $leader->typing_submissions_sum_score ?? 0;
-
-                    // Leader Rewards
-                    $leaderFrame = $leader->equippedFrame; // Eager loaded
-                    $leaderFrameData = optional($leaderFrame)->data ?? [];
-                    $leaderFrameGradient = $leaderFrameData['gradient'] ?? null;
-
-                    $leaderNameColor = $leader->equippedNameColor; // Eager loaded
-                    $leaderNameClass = $leaderNameColor ? ($leaderNameColor->data['class'] ?? '') : 'font-bold mt-2';
-                    if (!$leaderNameColor)
-                        $leaderNameClass .= ' text-gray-800'; // Fallback color
-                @endphp
-
-                @if($rank == 1)
-                    {{-- Gold --}}
-                    <div
-                        class="relative p-4 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 text-center text-white shadow-lg {{ $isCurrentUser ? 'ring-4 ring-primary-300' : '' }}">
-                        <div
-                            class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-crown text-amber-600"></i>
-                        </div>
-                        @if($isCurrentUser)
-                            <span class="absolute top-2 right-2 text-xs bg-white/30 px-2 py-0.5 rounded-full">คุณ</span>
-                        @endif
-
-                        <div class="relative mx-auto mt-4 w-14 h-14">
-                            @if($leaderFrameGradient)
-                                <div class="absolute -inset-1 rounded-full bg-gradient-to-br {{ $leaderFrameGradient }}"
-                                    style="padding: 2px;"></div>
-                            @endif
-                            <img src="{{ $leader->avatar_url }}" alt=""
-                                class="w-full h-full rounded-full border-2 border-white/30 object-cover relative z-10">
-                        </div>
-
-                        <p class="{{ $leaderNameClass }} mt-2 text-white drop-shadow-md">{{ Str::limit($leader->name, 12) }}</p>
-                        <p class="text-sm opacity-90">{{ number_format($score, 0) }} คะแนน</p>
-                    </div>
-                @elseif($rank == 2)
-                    {{-- Silver --}}
-                    <div
-                        class="relative p-4 rounded-xl bg-gradient-to-br from-gray-400 to-gray-500 text-center text-white shadow-lg {{ $isCurrentUser ? 'ring-4 ring-primary-300' : '' }}">
-                        <div
-                            class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-bold shadow-lg">
-                            2
-                        </div>
-                        @if($isCurrentUser)
-                            <span class="absolute top-2 right-2 text-xs bg-white/30 px-2 py-0.5 rounded-full">คุณ</span>
-                        @endif
-
-                        <div class="relative mx-auto mt-4 w-14 h-14">
-                            @if($leaderFrameGradient)
-                                <div class="absolute -inset-1 rounded-full bg-gradient-to-br {{ $leaderFrameGradient }}"
-                                    style="padding: 2px;"></div>
-                            @endif
-                            <img src="{{ $leader->avatar_url }}" alt=""
-                                class="w-full h-full rounded-full border-2 border-white/30 object-cover relative z-10">
-                        </div>
-
-                        <p class="{{ $leaderNameClass }} mt-2 text-white drop-shadow-md">{{ Str::limit($leader->name, 12) }}</p>
-                        <p class="text-sm opacity-90">{{ number_format($score, 0) }} คะแนน</p>
-                    </div>
-                @elseif($rank == 3)
-                    {{-- Bronze --}}
-                    <div
-                        class="relative p-4 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 text-center text-white shadow-lg {{ $isCurrentUser ? 'ring-4 ring-primary-300' : '' }}">
-                        <div
-                            class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-                            3
-                        </div>
-                        @if($isCurrentUser)
-                            <span class="absolute top-2 right-2 text-xs bg-white/30 px-2 py-0.5 rounded-full">คุณ</span>
-                        @endif
-
-                        <div class="relative mx-auto mt-4 w-14 h-14">
-                            @if($leaderFrameGradient)
-                                <div class="absolute -inset-1 rounded-full bg-gradient-to-br {{ $leaderFrameGradient }}"
-                                    style="padding: 2px;"></div>
-                            @endif
-                            <img src="{{ $leader->avatar_url }}" alt=""
-                                class="w-full h-full rounded-full border-2 border-white/30 object-cover relative z-10">
-                        </div>
-
-                        <p class="{{ $leaderNameClass }} mt-2 text-white drop-shadow-md">{{ Str::limit($leader->name, 12) }}</p>
-                        <p class="text-sm opacity-90">{{ number_format($score, 0) }} คะแนน</p>
-                    </div>
-                @else
-                    {{-- Rank 4 and 5 --}}
-                    <div
-                        class="relative p-4 rounded-xl bg-gray-100 text-center shadow {{ $isCurrentUser ? 'ring-4 ring-primary-300' : '' }}">
-                        <div
-                            class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-bold shadow">
-                            {{ $rank }}
-                        </div>
-                        @if($isCurrentUser)
-                            <span
-                                class="absolute top-2 right-2 text-xs bg-gray-300 px-2 py-0.5 rounded-full text-gray-600">คุณ</span>
-                        @endif
-
-                        <div class="relative mx-auto mt-4 w-14 h-14">
-                            @if($leaderFrameGradient)
-                                <div class="absolute -inset-1 rounded-full bg-gradient-to-br {{ $leaderFrameGradient }}"
-                                    style="padding: 2px;"></div>
-                            @endif
-                            <img src="{{ $leader->avatar_url }}" alt=""
-                                class="w-full h-full rounded-full border-2 border-gray-200 object-cover relative z-10">
-                        </div>
-
-                        <p class="{{ $leaderNameClass }} mt-2">{{ Str::limit($leader->name, 12) }}</p>
-                        <p class="text-sm text-gray-500">{{ number_format($score, 0) }} คะแนน</p>
-                    </div>
-                @endif
-            @empty
-                <div class="col-span-5 text-center py-8 text-gray-500">
-                    <i class="fas fa-trophy text-4xl text-gray-300 mb-2"></i>
-                    <p>ยังไม่มีข้อมูลผู้นำ</p>
-                </div>
-            @endforelse
-        </div>
-    </div>
+    <!-- Styles for specific animations -->
+    <style>
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(12deg); }
+            50% { transform: translateY(-10px) rotate(12deg); }
+            100% { transform: translateY(0px) rotate(12deg); }
+        }
+        .shimmer-text {
+            background: linear-gradient(to right, #6366f1 0%, #818cf8 50%, #6366f1 100%);
+            background-size: 200% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position: 200% center; }
+        }
+    </style>
 
 </x-typing-app>

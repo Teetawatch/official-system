@@ -905,5 +905,28 @@ class TypingAdminController extends Controller
             'error_count' => $errorCount,
         ]);
     }
+    public function destroySubmission(Request $request, $id)
+    {
+        $submission = TypingSubmission::findOrFail($id);
+
+        // Delete the file if it exists
+        if ($submission->file_path) {
+            $filePath = public_path($submission->file_path);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
+        $submission->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบงานเรียบร้อยแล้ว'
+            ]);
+        }
+
+        return back()->with('success', 'ลบงานเรียบร้อยแล้ว');
+    }
 }
 

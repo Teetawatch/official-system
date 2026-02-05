@@ -80,6 +80,7 @@ Route::prefix('typing')->name('typing.')->group(function () {
                 Route::get('/submissions/export/zip', [App\Http\Controllers\TypingAdminController::class, 'exportSubmissionsZip'])->name('submissions.export.zip');
                 Route::post('/submissions/{id}/auto-grade', [App\Http\Controllers\TypingAdminController::class, 'autoGradeSubmission'])->name('submissions.autograde');
                 Route::post('/submissions/auto-grade-all/{assignmentId}', [App\Http\Controllers\TypingAdminController::class, 'autoGradeAllSubmissions'])->name('submissions.autograde.all');
+                Route::delete('/submissions/{id}', [App\Http\Controllers\TypingAdminController::class, 'destroySubmission'])->name('submissions.destroy');
 
                 // Template Library Routes (Admin)
                 Route::prefix('templates')->name('templates.')->group(function () {
