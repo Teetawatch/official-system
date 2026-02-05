@@ -1,263 +1,278 @@
 <x-typing-app :role="'student'" :title="$template->title . ' - คลังเอกสารตัวอย่าง'">
+    <div class="space-y-8 pb-12">
+        <!-- Back Button & Page Header info -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <a href="{{ route('typing.student.templates.index') }}"
+                class="group flex items-center gap-3 px-6 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm font-black text-gray-400 hover:text-primary-600 hover:shadow-xl transition-all">
+                <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                <span>BACK TO LIBRARY</span>
+            </a>
 
-    <!-- Breadcrumb -->
-    <div class="mb-8">
-        <a href="{{ route('typing.student.templates.index') }}"
-            class="inline-flex items-center gap-2 text-gray-500 hover:text-violet-600 transition-colors">
-            <i class="fas fa-arrow-left"></i>
-            <span>กลับไปคลังเอกสาร</span>
-        </a>
-    </div>
+            <div class="flex items-center gap-4">
+                 <span class="px-4 py-1.5 rounded-xl bg-primary-50 text-[10px] font-black text-primary-500 uppercase tracking-widest border border-primary-100">
+                    Document Details
+                </span>
+                <span class="px-4 py-1.5 rounded-xl bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border border-gray-100">
+                    ID: #{{ str_pad($template->id, 5, '0', STR_PAD_LEFT) }}
+                </span>
+            </div>
+        </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content -->
-        <div class="lg:col-span-2">
-            <!-- Document Card -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-                <!-- Header with Thumbnail -->
-                <div class="relative h-72 md:h-[400px] bg-slate-50 flex items-center justify-center overflow-hidden">
-                    <!-- Dynamic Background -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5"></div>
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl -mr-32 -mt-32">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Main Content Area -->
+            <div class="lg:col-span-8 space-y-8">
+                <!-- Document Preview Card (Premium) -->
+                <div class="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-white overflow-hidden group">
+                    <!-- Aurora Preview Header -->
+                    <div class="relative h-80 md:h-[500px] flex items-center justify-center overflow-hidden">
+                        <!-- Aurora Background -->
+                        <div class="absolute inset-0 bg-[#0f172a]"></div>
+                        <div class="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-gradient-to-br from-primary-500/20 via-indigo-500/10 to-transparent rounded-full blur-[100px] animate-pulse-slow"></div>
+                        <div class="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] bg-gradient-to-tr from-purple-500/10 via-blue-500/10 to-transparent rounded-full blur-[80px] animate-pulse-slow" style="animation-delay: 2s"></div>
+                        
+                        <!-- Grid Overlay -->
+                        <div class="absolute inset-0 bg-[url('https://parallel.report/assets/grid.svg')] bg-center opacity-10 pointer-events-none"></div>
+
+                        <!-- Thumbnail or Placeholder -->
+                        <div class="relative z-10 w-full h-full p-8 md:p-16 flex items-center justify-center">
+                            @if($template->thumbnail)
+                                <div class="relative group/img backdrop-blur-2xl p-2 rounded-[2rem] bg-white/5 border border-white/10 shadow-2xl transition-all duration-700 hover:scale-[1.02]">
+                                    <img src="{{ asset('uploads/' . $template->thumbnail) }}" alt="{{ $template->title }}"
+                                        class="max-w-full max-h-[350px] md:max-h-[450px] object-contain rounded-[1.5rem] shadow-2xl">
+                                    <div class="absolute inset-0 rounded-[1.5rem] bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                                </div>
+                            @else
+                                <div class="text-center group/placeholder">
+                                    @php
+                                        $iconInfo = match (strtolower($template->file_type)) {
+                                            'pdf' => ['icon' => 'fa-file-pdf', 'color' => 'text-red-400', 'bg' => 'bg-red-500/10'],
+                                            'doc', 'docx' => ['icon' => 'fa-file-word', 'color' => 'text-blue-400', 'bg' => 'bg-blue-500/10'],
+                                            default => ['icon' => 'fa-file', 'color' => 'text-slate-400', 'bg' => 'bg-slate-500/10']
+                                        };
+                                    @endphp
+                                    <div class="w-48 h-48 rounded-[3rem] {{ $iconInfo['bg'] }} backdrop-blur-xl border border-white/10 flex items-center justify-center mb-6 shadow-2xl group-hover/placeholder:scale-110 group-hover/placeholder:rotate-3 transition-all duration-500">
+                                        <i class="fas {{ $iconInfo['icon'] }} {{ $iconInfo['color'] }} text-7xl"></i>
+                                    </div>
+                                    <p class="text-white/40 font-black text-sm uppercase tracking-[0.5em] group-hover/placeholder:tracking-[0.8em] transition-all duration-500">{{ $template->file_type }}</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Badges Overlay -->
+                        <div class="absolute top-8 left-8 flex flex-col gap-3 z-30">
+                            @if($template->is_featured)
+                                <span class="px-5 py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded-[1.25rem] shadow-2xl flex items-center gap-2 border border-white/20">
+                                    <i class="fas fa-star animate-pulse"></i> HIGH QUALITY
+                                </span>
+                            @endif
+                            <span class="px-5 py-2.5 bg-white/10 backdrop-blur-xl text-white text-[10px] font-black uppercase tracking-widest rounded-[1.25rem] border border-white/10">
+                                {{ $template->category }}
+                            </span>
+                        </div>
                     </div>
 
-                    @if($template->thumbnail)
-                        <img src="{{ asset('uploads/' . $template->thumbnail) }}" alt="{{ $template->title }}"
-                            class="relative z-10 w-auto h-full max-h-[80%] object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105">
-                    @else
-                        <div class="relative z-10 text-center group">
-                            @php
-                                $iconClass = match (strtolower($template->file_type)) {
-                                    'pdf' => 'fa-file-pdf text-red-500/20',
-                                    'doc', 'docx' => 'fa-file-word text-blue-500/20',
-                                    default => 'fa-file text-slate-300'
-                                };
-                                $accentColor = match (strtolower($template->file_type)) {
-                                    'pdf' => 'text-red-500',
-                                    'doc', 'docx' => 'text-blue-500',
-                                    default => 'text-slate-500'
-                                };
-                            @endphp
-                            <div class="relative flex items-center justify-center mb-6">
-                                <i
-                                    class="fas {{ $iconClass }} text-9xl transition-transform duration-500 group-hover:scale-110"></i>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span
-                                        class="text-2xl font-black {{ $accentColor }} uppercase tracking-widest opacity-60">{{ $template->file_type }}</span>
+                    <!-- Content Section -->
+                    <div class="p-8 md:p-12 relative">
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
+                            <div class="flex-1">
+                                <h1 class="text-3xl md:text-4xl font-black text-gray-800 tracking-tight leading-tight mb-6">
+                                    {{ $template->title }}
+                                </h1>
+                                @if($template->description)
+                                    <p class="text-lg text-gray-500 font-medium leading-relaxed max-w-3xl">
+                                        {{ $template->description }}
+                                    </p>
+                                @endif
+                            </div>
+                            
+                            <!-- Stats Chips -->
+                            <div class="flex flex-wrap gap-4 md:flex-col">
+                                <div class="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <i class="fas fa-download text-primary-500"></i>
+                                    <span class="text-sm font-black text-gray-700">{{ number_format($template->download_count) }} <span class="text-[10px] text-gray-400 ml-1">GETS</span></span>
+                                </div>
+                                <div class="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <i class="fas fa-eye text-indigo-500"></i>
+                                    <span class="text-sm font-black text-gray-700">{{ number_format($template->view_count) }} <span class="text-[10px] text-gray-400 ml-1">VIEWS</span></span>
                                 </div>
                             </div>
                         </div>
-                    @endif
 
-                    <!-- Badges Overlay -->
-                    <div class="absolute top-6 left-6 flex flex-wrap gap-3 z-20">
-                        @if($template->is_featured)
-                            <span
-                                class="px-3.5 py-2 bg-amber-400 text-amber-950 text-xs font-black uppercase rounded-xl shadow-lg border border-amber-300/50 flex items-center gap-2 backdrop-blur-md">
-                                <i class="fas fa-star text-[10px]"></i> Featured Template
-                            </span>
-                        @endif
-                        <span
-                            class="px-3.5 py-2 bg-white/20 backdrop-blur-md text-slate-700 text-xs font-bold uppercase rounded-xl shadow-sm border border-white/40">
-                            {{ $template->category }}
-                        </span>
+                        <!-- Bento Info Grid (Redesigned) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                            <div class="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 group/item hover:bg-white hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+                                <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 group-hover/item:bg-primary-500 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-file-invoice text-xl"></i>
+                                </div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">FILE TYPE</p>
+                                <h4 class="text-xl font-black text-gray-800">{{ strtoupper($template->file_type) }} FORMAT</h4>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 group/item hover:bg-white hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+                                <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 group-hover/item:bg-indigo-500 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-weight-hanging text-xl"></i>
+                                </div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">SIZE</p>
+                                <h4 class="text-xl font-black text-gray-800">{{ $template->formatted_file_size }}</h4>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-[2.5rem] p-8 border border-gray-100 group/item hover:bg-white hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+                                <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 group-hover/item:bg-purple-500 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-tag text-xl"></i>
+                                </div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">CATEGORY</p>
+                                <h4 class="text-xl font-black text-gray-800 truncate">{{ $template->category }}</h4>
+                            </div>
+                        </div>
+
+                        <!-- Actions Bar (Premium) -->
+                        <div class="p-4 bg-gray-50 rounded-[2rem] border border-gray-100 flex items-center gap-4">
+                            <a href="{{ route('typing.student.templates.download', $template) }}"
+                                class="flex-1 group/btn relative py-5 bg-gray-900 text-white font-black rounded-2xl hover:bg-primary-600 hover:shadow-2xl hover:shadow-primary-500/30 hover:-translate-y-1 transition-all overflow-hidden flex items-center justify-center gap-3">
+                                <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000"></div>
+                                <i class="fas fa-cloud-download-alt text-xl transition-transform group-hover/btn:rotate-12"></i>
+                                <span class="text-lg">DOWNLOAD NOW</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Content -->
-                <div class="p-8">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">{{ $template->title }}</h1>
+                <!-- How to Use Guidance (Premium Bento) -->
+                <div class="bg-white rounded-[3rem] p-10 md:p-14 border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary-50/50 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+                    
+                    <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                        <div class="w-24 h-24 rounded-[2rem] bg-indigo-50 text-indigo-500 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="fas fa-graduation-cap text-4xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h2 class="text-3xl font-black text-gray-800 tracking-tight mb-4">แนวทางการเรียนรู้</h2>
+                            <p class="text-gray-400 font-bold uppercase tracking-widest mb-10 text-xs">Steps to master this template</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div class="space-y-4">
+                                    <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center font-black text-gray-400 border border-gray-100 italic">01</div>
+                                    <h4 class="font-black text-gray-800">สำรวจรูปแบบ</h4>
+                                    <p class="text-sm text-gray-500 font-medium">สังเกตระยะขอบและตำแหน่งขององค์ประกอบทั้งหมด</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center font-black text-gray-400 border border-gray-100 italic">02</div>
+                                    <h4 class="font-black text-gray-800">วิเคราะห์ภาษา</h4>
+                                    <p class="text-sm text-gray-500 font-medium">ทำความเข้าใจระดับภาษาและรูปแบบการใช้คำเป็นทางการ</p>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center font-black text-gray-400 border border-gray-100 italic">03</div>
+                                    <h4 class="font-black text-gray-800">ฝึกพิมพ์เสมือนจริง</h4>
+                                    <p class="text-sm text-gray-500 font-medium">ใช้รูปแบบตัวอย่างเพื่อฝึกจัดวางเอกสารในโปรแกรมพิมพ์</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    @if($template->description)
-                        <div class="prose max-w-none text-gray-600 mb-6">
-                            <p>{{ $template->description }}</p>
-                        </div>
-                    @endif
+            <!-- Sidebar -->
+            <div class="lg:col-span-4 space-y-8">
+                <!-- Detailed File Info Card -->
+                <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                    <h3 class="font-black text-gray-800 text-lg flex items-center gap-3 mb-8 pb-6 border-b border-gray-50">
+                        <i class="fas fa-info-circle text-primary-500"></i>
+                        FILE SPECIFICATION
+                    </h3>
 
-                    <!-- Info Grid -->
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                        <div
-                            class="bg-slate-50 rounded-[1.5rem] p-5 text-center border border-slate-100/50 group hover:border-violet-200 hover:bg-violet-50/30 transition-all duration-300">
-                            <div
-                                class="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-download text-violet-500 text-sm"></i>
-                            </div>
-                            <p class="text-2xl font-black text-slate-800">{{ number_format($template->download_count) }}
-                            </p>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Downloads</p>
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between group">
+                            <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-primary-400 transition-colors">Filename</span>
+                            <span class="text-xs font-black text-gray-700 max-w-[180px] truncate" title="{{ $template->file_name }}">{{ $template->file_name }}</span>
                         </div>
-                        <div
-                            class="bg-slate-50 rounded-[1.5rem] p-5 text-center border border-slate-100/50 group hover:border-pink-200 hover:bg-pink-50/30 transition-all duration-300">
-                            <div
-                                class="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-eye text-pink-500 text-sm"></i>
-                            </div>
-                            <p class="text-2xl font-black text-slate-800">{{ number_format($template->view_count) }}</p>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Views</p>
+                        <div class="flex items-center justify-between group">
+                            <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-indigo-400 transition-colors">Uploaded</span>
+                            <span class="text-xs font-black text-gray-700">{{ $template->created_at->format('M d, Y') }}</span>
                         </div>
-                        <div
-                            class="bg-slate-50 rounded-[1.5rem] p-5 text-center border border-slate-100/50 group hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
-                            <div
-                                class="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-file-code text-blue-500 text-sm"></i>
-                            </div>
-                            <p class="text-2xl font-black text-slate-800">{{ strtoupper($template->file_type) }}</p>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Format</p>
-                        </div>
-                        <div
-                            class="bg-slate-50 rounded-[1.5rem] p-5 text-center border border-slate-100/50 group hover:border-indigo-200 hover:bg-indigo-50/30 transition-all duration-300">
-                            <div
-                                class="w-10 h-10 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-weight-hanging text-indigo-500 text-sm"></i>
-                            </div>
-                            <p class="text-2xl font-black text-slate-800">{{ $template->formatted_file_size }}</p>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">File Size</p>
+                        <div class="flex items-center justify-between group">
+                            <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-purple-400 transition-colors">Permissions</span>
+                            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[9px] font-black">READ & DOWNLOAD</span>
                         </div>
                     </div>
 
-                    <!-- Download Button -->
-                    <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="mt-10 p-4 rounded-3xl bg-gray-50 border border-gray-100 flex items-center gap-4">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="Uploader" class="w-10 h-10 rounded-xl object-cover">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-0.5">Verified Asset</p>
+                            <p class="text-xs font-black text-gray-800">System Official</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Related Content -->
+                @if($relatedTemplates->count() > 0)
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                        <h3 class="font-black text-gray-800 text-lg flex items-center gap-3 mb-8">
+                            <i class="fas fa-layer-group text-primary-500"></i>
+                            RECOMMENDATIONS
+                        </h3>
+
+                        <div class="space-y-4">
+                            @foreach($relatedTemplates as $related)
+                                <a href="{{ route('typing.student.templates.show', $related) }}"
+                                    class="group flex items-center gap-4 p-4 rounded-[1.5rem] bg-white border border-gray-50 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-500/5 transition-all">
+                                    <div class="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-50 transition-colors">
+                                        @php
+                                            $relIcon = match (strtolower($related->file_type)) {
+                                                'pdf' => 'fa-file-pdf text-red-500',
+                                                'doc', 'docx' => 'fa-file-word text-blue-500',
+                                                default => 'fa-file text-gray-400'
+                                            };
+                                        @endphp
+                                        <i class="fas {{ $relIcon }} text-lg opacity-40 group-hover:opacity-100 transition-opacity"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-black text-gray-800 group-hover:text-primary-600 transition-colors truncate">
+                                            {{ $related->title }}
+                                        </p>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">{{ $related->formatted_file_size }} • {{ strtoupper($related->file_type) }}</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-[10px] text-gray-300 group-hover:text-primary-500 group-hover:translate-x-1 transition-all"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Fast Download Widget (High Impact) -->
+                <div class="relative overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 rounded-[2.5rem] p-8 text-white shadow-2xl group">
+                    <div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner">
+                                <i class="fas fa-bolt text-2xl text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-black text-lg tracking-tight">QUICK ACCESS</h4>
+                                <p class="text-white/60 text-[10px] font-bold uppercase tracking-widest">Instant Download</p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-sm font-medium text-white/80 leading-relaxed mb-8">
+                            ต้องการข้อมูลแบบเร่งด่วน? คลิกที่นี่เพื่อดาวน์โหลดทันทีโดยไม่ต้องดูสถิติเพิ่มเติม
+                        </p>
+
                         <a href="{{ route('typing.student.templates.download', $template) }}"
-                            class="flex-1 py-4 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 text-lg">
-                            <i class="fas fa-download"></i>
-                            <span>ดาวน์โหลดเอกสาร</span>
+                            class="block w-full py-5 bg-white text-gray-900 font-black rounded-2xl hover:bg-gray-50 transition-all text-center group/btn shadow-xl shadow-black/10">
+                            <span class="flex items-center justify-center gap-3">
+                                <i class="fas fa-download transition-transform group-hover/btn:-translate-y-1"></i>
+                                START DOWNLOAD
+                            </span>
                         </a>
                     </div>
                 </div>
             </div>
-
-            <!-- How to Use Section -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                    <i class="fas fa-book-reader text-violet-500"></i>
-                    วิธีใช้เอกสารตัวอย่าง
-                </h2>
-
-                <div class="space-y-4">
-                    <div class="flex gap-4 p-4 bg-violet-50 rounded-xl">
-                        <div
-                            class="w-10 h-10 rounded-full bg-violet-500 text-white flex items-center justify-center font-bold flex-shrink-0">
-                            1</div>
-                        <div>
-                            <h3 class="font-semibold text-gray-800">ดาวน์โหลดเอกสาร</h3>
-                            <p class="text-sm text-gray-600 mt-1">คลิกปุ่มดาวน์โหลดเพื่อบันทึกไฟล์ลงในคอมพิวเตอร์ของคุณ
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4 p-4 bg-purple-50 rounded-xl">
-                        <div
-                            class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold flex-shrink-0">
-                            2</div>
-                        <div>
-                            <h3 class="font-semibold text-gray-800">ศึกษารูปแบบ</h3>
-                            <p class="text-sm text-gray-600 mt-1">เปิดไฟล์และศึกษารูปแบบการจัดหน้า ระยะขอบ
-                                ตำแหน่งขององค์ประกอบต่างๆ</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4 p-4 bg-indigo-50 rounded-xl">
-                        <div
-                            class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold flex-shrink-0">
-                            3</div>
-                        <div>
-                            <h3 class="font-semibold text-gray-800">ฝึกปฏิบัติ</h3>
-                            <p class="text-sm text-gray-600 mt-1">ลองพิมพ์ตามรูปแบบของเอกสารตัวอย่าง
-                                เพื่อฝึกทักษะการพิมพ์หนังสือราชการ</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-6">
-            <!-- File Info Card -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-file-alt text-violet-500"></i>
-                    ข้อมูลไฟล์
-                </h3>
-
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 text-sm">ชื่อไฟล์</span>
-                        <span
-                            class="text-gray-800 font-medium text-sm text-right max-w-[180px] truncate">{{ $template->file_name }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 text-sm">ประเภท</span>
-                        <span class="text-gray-800 font-medium">{{ strtoupper($template->file_type) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 text-sm">ขนาด</span>
-                        <span class="text-gray-800 font-medium">{{ $template->formatted_file_size }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span class="text-gray-500 text-sm">หมวดหมู่</span>
-                        <span
-                            class="px-2 py-1 bg-violet-100 text-violet-700 text-xs font-semibold rounded">{{ $template->category }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-gray-500 text-sm">อัปโหลดเมื่อ</span>
-                        <span
-                            class="text-gray-800 font-medium text-sm">{{ $template->created_at->locale('th')->isoFormat('D MMM YYYY') }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Related Templates -->
-            @if($relatedTemplates->count() > 0)
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-folder text-violet-500"></i>
-                        เอกสารที่เกี่ยวข้อง
-                    </h3>
-
-                    <div class="space-y-3">
-                        @foreach($relatedTemplates as $related)
-                            <a href="{{ route('typing.student.templates.show', $related) }}"
-                                class="flex items-center gap-3 p-3 rounded-xl hover:bg-violet-50 transition-colors group">
-                                <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                    @php
-                                        $relatedIcon = match (strtolower($related->file_type)) {
-                                            'pdf' => 'fa-file-pdf text-red-400',
-                                            'doc', 'docx' => 'fa-file-word text-blue-400',
-                                            default => 'fa-file text-gray-400'
-                                        };
-                                    @endphp
-                                    <i class="fas {{ $relatedIcon }}"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p
-                                        class="text-sm font-medium text-gray-700 group-hover:text-violet-600 transition-colors truncate">
-                                        {{ $related->title }}
-                                    </p>
-                                    <p class="text-xs text-gray-400">{{ $related->formatted_file_size }}</p>
-                                </div>
-                                <i
-                                    class="fas fa-chevron-right text-xs text-gray-300 group-hover:text-violet-400 transition-colors"></i>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
-            <!-- Quick Download -->
-            <div class="bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-6 text-white">
-                <div class="text-center mb-4">
-                    <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-download text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-lg">ดาวน์โหลดเอกสาร</h3>
-                    <p class="text-violet-200 text-sm mt-1">{{ $template->file_name }}</p>
-                </div>
-                <a href="{{ route('typing.student.templates.download', $template) }}"
-                    class="block w-full py-3 bg-white text-violet-700 font-bold rounded-xl hover:bg-violet-50 transition-colors text-center">
-                    <i class="fas fa-download mr-2"></i> ดาวน์โหลด
-                </a>
-            </div>
         </div>
     </div>
 
+    <style>
+        .animate-pulse-slow { animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.3; } }
+        .shadow-glow { filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3)); }
+    </style>
 </x-typing-app>
